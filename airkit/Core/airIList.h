@@ -43,7 +43,7 @@ namespace air
             mRoot.setNode((Node *)&mRoot, (Node *)&mRoot);
         }
         // 初始链表
-        inline void initList() { mCount = 0, mRoot.SetNode((Node *)&mRoot, (Node *)&mRoot); }
+        inline void initList() { mCount = 0, mRoot.setNode((Node *)&mRoot, (Node *)&mRoot); }
         // 获取根，只读
         inline Node *getRoot() { return (Node *)&mRoot; }
         // 获取节点计数
@@ -52,8 +52,8 @@ namespace air
         inline Node *getEntry()
         {
             Node *ret = mRoot.getNext();
-            if (ret == &mRoot)
-                ret = nullptr;
+           /* if (ret == &mRoot)
+                ret = nullptr;*/
             return ret;
         }
         inline Node *front() { return getEntry(); }
@@ -61,8 +61,8 @@ namespace air
         inline Node *getTail()
         {
             Node *ret = mRoot.getPrev();
-            if (ret == &mRoot)
-                ret = nullptr;
+             /* if (ret == &mRoot)
+                ret = nullptr;*/
             return ret;
         }
         inline Node *back() { return getTail(); }
@@ -78,7 +78,7 @@ namespace air
             ++mCount;
         }
         // 从尾部插入
-        inline void snsertTail(Node *node)
+        inline void insertTail(Node *node)
         {
             Node *tail = mRoot.getPrev();
             node->setPrev(tail);

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <new>
-
+#include <airkit/AIR_COMPILE_OPTION.h>
 namespace air
 {
     using int8 = int8_t;
@@ -39,7 +39,12 @@ namespace air
 #define this_file() __FILE__
 #define this_line() __LINE__
 #define this_func() __FUNCTION__
+// 求数组维度
 #define array_size(obj, type) (sizeof(obj) / sizeof(type))
+// 位左偏移
+#define bits32(at) (1u << at)
+// 位左偏移
+#define bits64(at) (1ull << at)
 }
 
 #endif //!__AIRTYPES__H__
