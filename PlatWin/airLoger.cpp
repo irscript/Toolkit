@@ -5,6 +5,7 @@
 
 namespace air
 {
+    SLoger print(nullptr, SLoger::White);
 
     SLoger memlog("MemSys", SLoger::LightRed);
 #ifdef _check_trace_log
@@ -17,7 +18,10 @@ namespace air
         mLock.lock();
         HANDLE hCns = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hCns, mClr);
-        printf("[ %s ]: %s\n", mPrev, msg);
+        if (mPrev != nullptr)
+            printf("[ %s ]: %s\n", mPrev, msg);
+        else
+            printf(msg);
         mLock.unlock();
     }
     // 打印日志
@@ -26,7 +30,8 @@ namespace air
         mLock.lock();
         HANDLE hCns = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hCns, mClr);
-        printf("[ %s ]: ", mPrev);
+        if (mPrev != nullptr)
+            printf("[ %s ]: ", mPrev);
         va_list ap;
         va_start(ap, fmt);
         vsnprintf(mBuffer, sizeof(mBuffer), fmt, ap);
@@ -39,7 +44,10 @@ namespace air
     {
         HANDLE hCns = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hCns, mClr);
-        printf("[ %s ]: %s", mPrev, msg);
+        if (mPrev != nullptr)
+            printf("[ %s ]: %s\n", mPrev, msg);
+        else
+            printf(msg);
     }
     // 追加日志
     void SLoger::append(cstring fmt, ...)

@@ -1,5 +1,5 @@
 #include <airkit/Core/airAlloc.h>
-#include <airkit/Core/airIList.h>
+#include <airkit/Struct/airIList.h>
 #include <airkit/Plat/airLoger.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -468,6 +468,7 @@ namespace air
     // 释放内存系统
     void terminalMemSys()
     {
+        checkMemSys(); // 主线程内存释放情况
         MemAlloctorTLS::mTLS.terminal();
         MemAlloctor::mCenter.terminal();
     }

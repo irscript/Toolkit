@@ -59,7 +59,8 @@ namespace air
 
         static Spinlock mLock;
     };
-
+    // 通用打印
+    extern SLoger print;
     // 内存日志系统
     extern SLoger memlog;
 

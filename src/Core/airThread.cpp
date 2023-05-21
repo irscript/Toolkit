@@ -1,5 +1,5 @@
 #include <airkit/Plat/airThread.h>
-
+#include <airkit/Core/airAlloc.h>
 #include <pthread.h>
 #include <semaphore.h>
 
@@ -135,6 +135,7 @@ namespace air
     {
         Thread *thread = static_cast<Thread *>(data);
         auto ret = thread->worker();
+        checkMemSys();
         thread->mStoped = EBool::True;
         // pthread_exit((void *)0);
         return (void *)ret;
@@ -146,6 +147,7 @@ namespace air
             return EBool::False;
 
         mShouldRun = EBool::True;
+        mStoped = EBool::False;
         mDetached = detach;
 
         pthread_attr_t type;

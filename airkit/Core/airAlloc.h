@@ -1,7 +1,6 @@
 #ifndef __AIRALLOC__H__
 #define __AIRALLOC__H__
 
-#include <airkit/Core/airIList.h>
 #include <airkit/Plat/airThread.h>
 
 // 内存分配器
@@ -13,12 +12,8 @@ namespace air
     // 释放内存系统
     void terminalMemSys();
 
-//打印bug信息
-#ifdef _check_memory_free
-void checkMemSys();
-#else
-#define checkMemSys()
-#endif
+    // 打印内存bug信息
+    void checkMemSys();
 
 // 内存分配
 #ifdef _check_memory_free
@@ -66,16 +61,22 @@ void checkMemSys();
         }
     };
 
-    // 内存池
-    template <typename Type>
-    struct MemPool
+    // 内存分配器
+    struct Alloctor
     {
-        inline static Type *get()
+        // 获取内存
+        template <typename Type, typename... Args>
+        inline static Type *get(Args... args)
         {
             auto obj = (Type *)alloc(sizeof(Type));
-            constructor<Type>(obj);
+            /*if (sizeof... (args) == 0)
+                constructor<Type>(obj);
+            else*/
+            constructor<Type>(obj, args...);
             return obj;
         }
+        // 释放内存
+        template <typename Type>
         inline static void free(Type *block)
         {
             destructor<Type>(block);

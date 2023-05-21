@@ -40,7 +40,7 @@ namespace air
     };
     // c++构造函数调用
     template <typename Type, typename... Args>
-    inline Type *constructor(uintptr obj, Args... args)
+    inline Type *constructor(Type *obj, Args... args)
     {
         Type *ret = (Type *)obj;
         ::new (obj) Type(args...);
