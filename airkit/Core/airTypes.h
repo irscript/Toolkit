@@ -1,9 +1,9 @@
 #ifndef __AIRTYPES__H__
 #define __AIRTYPES__H__
 
-#include <cstdint>
-#include <new>
 #include <airkit/AIR_COMPILE_OPTION.h>
+#include <airkit/AIR_PCH.h>
+
 namespace air
 {
     using int8 = int8_t;
@@ -31,6 +31,24 @@ namespace air
         True
     };
 
+    // 不可复制对象
+    class NonCopyable
+    {
+    public:
+        NonCopyable(const NonCopyable &) = delete;
+        NonCopyable &operator=(const NonCopyable &) = delete;
+    };
+    // c++构造函数调用
+    template <typename Type, typename... Args>
+    inline Type *constructor(uintptr obj, Args... args)
+    {
+        Type *ret = (Type *)obj;
+        ::new (obj) Type(args...);
+        return ret;
+    }
+    // c++析构函数手动调用
+    template <typename Type>
+    inline void destructor(Type *obj) { obj->~Type(); }
     // 向上大小对齐
     template <typename T>
     inline T alignup(T num, T base) { return ((num + base - 1) & (~(base - 1))); }
@@ -39,6 +57,7 @@ namespace air
 #define this_file() __FILE__
 #define this_line() __LINE__
 #define this_func() __FUNCTION__
+
 // 求数组维度
 #define array_size(obj, type) (sizeof(obj) / sizeof(type))
 // 位左偏移

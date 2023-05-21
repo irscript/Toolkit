@@ -2,7 +2,7 @@
 #define __AIRLOGER__H__
 
 #include <airkit/Core/airTypes.h>
-
+#include <airkit/Plat/airThread.h>
 namespace air
 {
 
@@ -28,16 +28,20 @@ namespace air
             FaintYellow, // 淡黄色
             BrightWhite, // 亮白色
         };
-        SLoger(cstring prefix, uint32 frg, uint32 bkg = SLoger::Black)
-            : mPrev(prefix), mClr(frg | bkg) {}
+        SLoger(cstring prefix, uint32 frt, uint32 bkg = SLoger::Black)
+            : mPrev(prefix), mClr(frt | bkg) {}
 
         // 打印日志
         void print(cstring msg);
         void printfmt(cstring fmt, ...);
+
+        inline void start() { mLock.lock(); }
+        void print2(cstring msg);
         // 追加日志
         void append(cstring fmt, ...);
         // 带颜色追加日志
         void appendWithClr(uint32 clr, cstring fmt, ...);
+        inline void end() { mLock.unlock(); }
 
         template <typename... Arg>
         inline constexpr void operator()(cstring fmt, Arg... arg)
@@ -52,6 +56,8 @@ namespace air
         cstring mPrev;      // 日志前缀
         uint32 mClr;        // 日志颜色
         char mBuffer[2048]; // 日志缓存
+
+        static Spinlock mLock;
     };
 
     // 内存日志系统

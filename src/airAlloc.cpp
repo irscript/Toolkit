@@ -22,10 +22,82 @@ namespace air
 #define _pool_count (_block_max_size / _block_alig_size) // 32
 
     //-------------内存系统分配释放----------------------------
-    // 初始化内存系统
-    void initMemSys() {}
-    // 释放内存系统
-    void uninitMemSys() {}
+
+    // 内存分配系统
+    // 内存块头
+    struct BlockHead : public IListNode<BlockHead>
+    {
+        // 内存debug信息
+#ifdef _check_memory_free
+        cstring mDbgFile;
+        uint32 mDbgLine;
+#endif
+        uintptr mData[]; // 空数组
+    };
+    // 内存池头
+    struct PoolkHead : public IListNode<PoolkHead>
+    {
+        // 初始化池
+        inline void initPool(uint32 size);
+        uint32 mBlkSize;          // 池内单个分块大小
+        uint32 mBlkCount;         // 池内分块个数
+        IList<BlockHead> mBlocks; // 未使用块链表
+    };
+    // 巨页内存头
+    struct AreaHead : public IListNode<AreaHead>
+    {
+        // 初始化页
+        inline void initArea();
+        uint32 mPoolCount;       // 页内分池个数
+        IList<PoolkHead> mPools; // 未使用池链表
+    };
+    // 内存池分配中心
+    struct MemPoolCenter
+    {
+        inline MemPoolCenter() { init(); }
+        // 初始化
+        inline void init() { mArealist.initList(); }
+        // 终止化
+        inline void terminal();
+        // 获取一个页
+        inline AreaHead *getArea();
+        // 获取一个池
+        inline PoolkHead *getPool();
+        // 释放一个池
+        inline void freePool(PoolkHead *pool);
+
+    private:
+        Spinlock mLock;
+        IList<AreaHead> mArealist; // 巨页链表
+    };
+
+    // 通用内存分配器
+    struct MemAlloctor
+    {
+        inline MemAlloctor() {}
+        inline ~MemAlloctor() {}
+
+        static MemPoolCenter mCenter;             // 内存池分配中心
+        IList<PoolkHead> mPoollist[_pool_count];  // 使用的池链表
+        IList<BlockHead> mBlocklist[_pool_count]; // 使用的块链表
+        IList<BlockHead> mBigslist;               // 大内存块
+
+        inline void init();
+        inline void terminal();
+
+        inline void checkFree();
+
+        inline uintptr alloctor(
+            uint size
+#ifdef _check_memory_free
+            ,
+            cstring filepos, uint32 linepos
+#endif
+        );
+        inline void dealloctor(uintptr blk);
+    };
+
+    MemPoolCenter MemAlloctor::mCenter;
 
     void PoolkHead::initPool(uint32 size)
     {
@@ -97,6 +169,7 @@ namespace air
     }
     PoolkHead *MemPoolCenter::getPool()
     {
+        mLock.lock();
         // 查找可分配的巨页
         AreaHead *area = nullptr;
         for (auto iter = mArealist.front();
@@ -121,13 +194,15 @@ namespace air
         }
         // 查找池
         PoolkHead *pool = area->mPools.removeTail();
-
+        mLock.unlock();
         return pool;
     }
     void MemPoolCenter::freePool(PoolkHead *pool)
     {
         if (pool == nullptr)
             return;
+
+        mLock.lock();
         uint pos = (uint)pool;
         // 找到在哪个巨页
         for (auto iter = mArealist.front();
@@ -139,63 +214,89 @@ namespace air
             if (start < pos && pos < end)
             {
                 iter->mPools.insertEntry(pool);
+                // 再次初始化池
+                pool->mBlocks.initList();
+                pool->mBlkSize = 0;
+                pool->mBlkCount = 0;
                 // 页是否使用完毕,使用完毕释放内存
                 if (iter->mPoolCount == iter->mPools.getCount())
                 {
                     mArealist.remove(iter);
                     free(iter);
                 }
+
+                mLock.unlock();
                 return;
             }
         }
         memlog("未知池：0x%lx\n", pool);
+        mLock.unlock();
     }
 
-    MemAlloctor::MemAlloctor()
+    void MemAlloctor::init()
     {
-        mCenter.init();
-        for (uint32 i = 0; i < 32; ++i)
+        for (uint32 i = 0; i < _pool_count; ++i)
         {
             mPoollist[i].initList();
             mBlocklist[i].initList();
         }
         mBigslist.initList();
     }
-    MemAlloctor::~MemAlloctor()
+
+    void MemAlloctor::checkFree()
     {
-        // 释放通用内存块
 #ifdef _check_memory_free
         uint dbgcnt = 0;
-        memlog("------------------checking-free-start---------------------\n");
+        memlog.start();
+        auto id = Thread::getCurrentThreadID();
+        // memlog.print2("");
+        memlog.append("------------------checking-free-start[ thread:0x%lx ]---------------------\n", id);
+
         // 通用内存块
-        for (uint i = 0; i < 32; ++i)
+        for (uint i = 0; i < _pool_count; ++i)
         {
             auto size = (i + 1) * 8;
             for (auto iter = mBlocklist[i].getEntry();
                  iter != mBlocklist[i].getRoot();
                  iter = iter->getNext())
             {
-                memlog("checking-free>addr: 0x%lx\tsize: %d \tin [file: %s\tline: %d]!\n",
-                       iter, size,
-                       iter->mDbgFile, iter->mDbgLine);
+                memlog.append("checking-free>\taddr: 0x%lx\tsize: %d \tin [file: %s\tline: %d]!\n",
+                              iter, size,
+                              iter->mDbgFile, iter->mDbgLine);
                 ++dbgcnt;
             }
         }
+        memlog.append("\n------------------checking-big-free----------------------\n");
         // 大内存
         for (auto iter = mBigslist.getEntry();
              iter != mBigslist.getRoot();
              iter = iter->getNext())
         {
-            memlog("checking-big-free>addr: 0x%lx\tin [file: %s\tline: %d ]!\n",
-                   iter,
-                   iter->mDbgFile, iter->mDbgLine);
+            memlog.append("checking-big-free>\taddr: 0x%lx\tin [file: %s\tline: %d ]!\n",
+                          iter,
+                          iter->mDbgFile, iter->mDbgLine);
             ++dbgcnt;
         }
-        memlog("------------------checking-free-end----------------------\n");
-        memlog("checking-free-count: %ld\n\n", dbgcnt);
+        memlog.append("\nchecking-free-count: %ld\n\n", dbgcnt);
+        // memlog.print2("");
+        memlog.append("------------------checking-free-end[ thread:0x%lx ]----------------------\n", id);
+        memlog.end();
 #endif
-        mCenter.terminal();
+    }
 
+    void MemAlloctor::terminal()
+    {
+        // 释放内存池
+        for (uint i = 0; i < _pool_count; ++i)
+        {
+            auto cnt = mPoollist[i].getCount();
+            for (uint ic = 0; ic < cnt; ++ic)
+            {
+                auto pool = mPoollist[i].removeEntry();
+                mCenter.freePool(pool);
+            }
+            mBlocklist[i].initList();
+        }
         // 释放大内存块
         auto cnt = mBigslist.getCount();
         for (uint i = 0; i < cnt; ++i)
@@ -204,6 +305,7 @@ namespace air
             free(node);
         }
     }
+
     uintptr MemAlloctor::alloctor(uint size
 #ifdef _check_memory_free
                                   ,
@@ -314,17 +416,85 @@ namespace air
         memlog("未知内存块：0x%x\n", blk);
     }
 
+    // 内存池线程局部变量
+    class MemAlloctorTLS
+    {
+    public:
+        MemAlloctorTLS() {}
+
+        inline void init() { mInstance.create(MemAlloctorTLS::destroy); }
+        inline void terminal() { mInstance.destroy(); }
+
+        inline MemAlloctor &instance()
+        {
+            MemAlloctor *obj = (MemAlloctor *)mInstance.get();
+            if (obj == nullptr)
+            {
+                obj = (MemAlloctor *)malloc(sizeof(MemAlloctor));
+                constructor<MemAlloctor>(obj);
+                obj->init();
+                mInstance.set(obj);
+            }
+            return *obj;
+        }
+        // 唯一实例
+        static MemAlloctorTLS mTLS;
+
+    private:
+        TLSV mInstance;
+
+        MemAlloctorTLS(const MemAlloctorTLS &) = delete;
+        MemAlloctorTLS &operator=(const MemAlloctorTLS &) = delete;
+        // 内存释放
+        static void destroy(uintptr ins);
+    };
+    MemAlloctorTLS MemAlloctorTLS::mTLS;
+    void MemAlloctorTLS::destroy(uintptr ins)
+    {
+        if (ins != nullptr)
+        {
+            MemAlloctor *obj = (MemAlloctor *)ins;
+            obj->terminal();
+            destructor<MemAlloctor>(obj);
+            free(obj);
+        }
+    }
+    // 初始化内存系统
+    void initMemSys()
+    {
+        MemAlloctor::mCenter.init();
+        MemAlloctorTLS::mTLS.init();
+    }
+    // 释放内存系统
+    void terminalMemSys()
+    {
+        MemAlloctorTLS::mTLS.terminal();
+        MemAlloctor::mCenter.terminal();
+    }
 #ifdef _check_memory_free
     uintptr alloc_(uint size, cstring filepos, uint32 linepos)
 #else
     uintptr alloc(uint size)
 #endif
     {
+        auto &memsys = MemAlloctorTLS::mTLS.instance();
+        return memsys.alloctor(size
+#ifdef _check_memory_free
+                               ,
+                               filepos, linepos
+#endif
+        );
         return nullptr;
     }
 
     void dealloc(uintptr block)
     {
+        auto &memsys = MemAlloctorTLS::mTLS.instance();
+        memsys.dealloctor(block);
     }
-
+    void checkMemSys()
+    {
+        auto &memsys = MemAlloctorTLS::mTLS.instance();
+        memsys.checkFree();
+    }
 }

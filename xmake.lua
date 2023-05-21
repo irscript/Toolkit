@@ -3,7 +3,9 @@ add_rules("mode.debug", "mode.release")
 if (is_mode("debug")) then
     add_defines("_check_memory_free")
 end
-
+if (is_mode("release")) then
+    add_defines("_air_no_debug")
+end
 set_languages("c17","c++17")
 add_includedirs("./")
 
@@ -16,6 +18,7 @@ target("airkit-dll")
     if(is_os("windows"))then 
         add_files("PlatWin/**.cpp")
     end
+    add_links("pthread")
 --静态库
 target("airkit-lib")
     set_kind("static")
@@ -23,6 +26,7 @@ target("airkit-lib")
     if(is_os("windows"))then 
         add_files("PlatWin/**.cpp")
     end
+    add_links("ptheard")
 --测试
 target("test")
     set_kind("binary")
