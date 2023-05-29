@@ -69,9 +69,6 @@ namespace air
         inline static Type *get(Args... args)
         {
             auto obj = (Type *)alloc(sizeof(Type));
-            /*if (sizeof... (args) == 0)
-                constructor<Type>(obj);
-            else*/
             constructor<Type>(obj, args...);
             return obj;
         }

@@ -10,9 +10,12 @@
 
 // 确保表达式成立
 #ifndef _air_no_debug
-#define ensure(exp) assert(exp)
+#define make_ensure(exp) assert(exp)
 #else
-#define ensure(exp)
+#define make_ensure(exp)
 #endif //_air_no_debug
+
+// 展开循环优化
+#define OPT_UNROLL __attribute__((__optimize__("-funroll-loops")))
 
 #endif //!__AIR_COMPILE_OPTION__H__

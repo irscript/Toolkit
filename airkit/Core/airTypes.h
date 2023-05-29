@@ -22,10 +22,12 @@ namespace air
     using flt32 = float;
     using flt64 = double;
 
+    using real = flt32;
+
     using cstring = const char *;
     using uintptr = void *;
 
-    enum class EBool : uint32
+    enum class Bool : uint32
     {
         False,
         True
@@ -38,6 +40,7 @@ namespace air
         NonCopyable(const NonCopyable &) = delete;
         NonCopyable &operator=(const NonCopyable &) = delete;
     };
+
     // c++构造函数调用
     template <typename Type, typename... Args>
     inline Type *constructor(Type *obj, Args... args)
@@ -51,7 +54,19 @@ namespace air
     inline void destructor(Type *obj) { obj->~Type(); }
     // 向上大小对齐
     template <typename T>
-    inline T alignup(T num, T base) { return ((num + base - 1) & (~(base - 1))); }
+    inline constexpr T alignup(T num, T base) { return (num + base - 1) & (~(base - 1)); }
+    // 向下大小对齐
+    template <typename T>
+    inline constexpr T aligndown(T num, T base) { return (num & ~(base - 1)); }
+    
+    // 生成ID
+    inline constexpr uint32 makeID32(uint32 b1, uint32 b2, uint32 b3, uint32 b4) { return b1 << 24 | b2 << 16 | b3 << 8 | b4; }
+    inline constexpr uint64 makeID64(uint64 b1, uint64 b2, uint64 b3, uint64 b4,
+                                     uint64 b5, uint64 b6, uint64 b7, uint64 b8) { return b1 << 56 | b2 << 48 | b3 << 40 | b4 << 36 |
+                                                                                          b5 << 24 | b6 << 16 | b7 << 8 | b8; }
+    // 位左移
+    inline constexpr uint32 bits32(uint32 offset) { return 1u << offset; }
+    inline constexpr uint64 bits64(uint32 offset) { return 1ull << offset; }
 
 //-------通用宏定义
 #define this_file() __FILE__
@@ -60,10 +75,7 @@ namespace air
 
 // 求数组维度
 #define array_size(obj, type) (sizeof(obj) / sizeof(type))
-// 位左偏移
-#define bits32(at) (1u << at)
-// 位左偏移
-#define bits64(at) (1ull << at)
+
 }
 
 #endif //!__AIRTYPES__H__

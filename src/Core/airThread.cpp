@@ -5,10 +5,10 @@
 
 namespace air
 {
-    Spinlock::Spinlock(EBool shared) : mHandle(0)
+    Spinlock::Spinlock(Bool shared) : mHandle(0)
     {
         pthread_spinlock_t *spin = (pthread_mutex_t *)&mHandle;
-        pthread_spin_init(spin, shared == EBool::True ? PTHREAD_PROCESS_SHARED : PTHREAD_PROCESS_PRIVATE);
+        pthread_spin_init(spin, shared == Bool::True ? PTHREAD_PROCESS_SHARED : PTHREAD_PROCESS_PRIVATE);
     }
 
     Spinlock::~Spinlock()
@@ -50,11 +50,11 @@ namespace air
         pthread_mutex_lock((pthread_mutex_t *)&mHandle);
     }
 
-    EBool Mutex::trylock()
+    Bool Mutex::trylock()
     {
         return pthread_mutex_trylock((pthread_mutex_t *)&mHandle) == 0
-                   ? EBool::True
-                   : EBool::False;
+                   ? Bool::True
+                   : Bool::False;
     }
 
     void Mutex::unlock()
@@ -120,9 +120,9 @@ namespace air
     ThreadID Thread::mMainID = 0;
     Thread::Thread()
         : mHanlde(0),
-          mShouldRun(EBool::False),
-          mDetached(EBool::False),
-          mStoped(EBool::False)
+          mShouldRun(Bool::False),
+          mDetached(Bool::False),
+          mStoped(Bool::False)
     {
     }
 
@@ -136,32 +136,32 @@ namespace air
         Thread *thread = static_cast<Thread *>(data);
         auto ret = thread->worker();
         checkMemSys();
-        thread->mStoped = EBool::True;
+        thread->mStoped = Bool::True;
         // pthread_exit((void *)0);
         return (void *)ret;
     }
 
-    EBool Thread::start(EBool detach)
+    Bool Thread::start(Bool detach)
     {
         if (mHanlde != 0)
-            return EBool::False;
+            return Bool::False;
 
-        mShouldRun = EBool::True;
-        mStoped = EBool::False;
+        mShouldRun = Bool::True;
+        mStoped = Bool::False;
         mDetached = detach;
 
         pthread_attr_t type;
         pthread_attr_init(&type);
         pthread_attr_setdetachstate(&type,
-                                    detach == EBool::True ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
+                                    detach == Bool::True ? PTHREAD_CREATE_DETACHED : PTHREAD_CREATE_JOINABLE);
         pthread_create((pthread_t *)&mHanlde, &type, threadFunctionStatic, this);
 
-        auto ret = mHanlde != 0 ? EBool::True : EBool::False;
+        auto ret = mHanlde != 0 ? Bool::True : Bool::False;
         // 没有创建成功
-        if (ret == EBool::False)
+        if (ret == Bool::False)
         {
-            mShouldRun = EBool::False;
-            mDetached = EBool::False;
+            mShouldRun = Bool::False;
+            mDetached = Bool::False;
         }
         return ret;
     }
@@ -171,28 +171,28 @@ namespace air
         if (mHanlde == 0)
             return;
 
-        mShouldRun = EBool::False;
-        if (mDetached == EBool::False)
+        mShouldRun = Bool::False;
+        if (mDetached == Bool::False)
             pthread_join((pthread_t)mHanlde, 0);
 
-        while (mStoped != EBool::True)
+        while (mStoped != Bool::True)
             ;
 
         mHanlde = 0;
     }
 
-    EBool Thread::detach()
+    Bool Thread::detach()
     {
         // 已经分离
-        if (mHanlde == 0 || mDetached == EBool::True)
-            return EBool::False;
+        if (mHanlde == 0 || mDetached == Bool::True)
+            return Bool::False;
         // 分离失败
         if (pthread_detach((pthread_t)mHanlde) == 0)
         {
-            mDetached = EBool::True;
-            return EBool::True;
+            mDetached = Bool::True;
+            return Bool::True;
         }
-        return EBool::False;
+        return Bool::False;
     }
 
     ThreadID Thread::getCurrentThreadID()
@@ -207,11 +207,11 @@ namespace air
         return mMainID;
     }
 
-    EBool Thread::isMainThread()
+    Bool Thread::isMainThread()
     {
         auto id = (ThreadID)pthread_self();
 
-        return mMainID == id ? EBool::True : EBool::False;
+        return mMainID == id ? Bool::True : Bool::False;
     }
 
 }

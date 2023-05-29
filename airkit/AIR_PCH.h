@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <cstdio>
+#include <cmath>
+#include <cstring>
 
 #include <new>
 #include <assert.h>

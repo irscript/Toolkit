@@ -20,13 +20,13 @@ target("airkit-dll")
     end
     add_links("pthread")
 --静态库
-target("airkit-lib")
-    set_kind("static")
-    add_files("src/**.cpp")
-    if(is_os("windows"))then 
-        add_files("PlatWin/**.cpp")
-    end
-    add_links("ptheard")
+--target("airkit-lib")
+ --   set_kind("static")
+ --   add_files("src/**.cpp")
+ --   if(is_os("windows"))then 
+ --       add_files("PlatWin/**.cpp")
+ --   end
+ --   add_links("ptheard")
 --测试
 target("test")
     set_kind("binary")

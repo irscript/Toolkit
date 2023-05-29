@@ -21,7 +21,7 @@ namespace air
 
         // 获取内存
         template <typename... Args>
-        inline static Node *get(Args... args)
+        inline static Node *getNode(Args... args)
         {
             auto obj = (Node *)alloc(sizeof(Node));
             /*if (sizeof... (args) == 0)
@@ -31,7 +31,7 @@ namespace air
             return obj;
         }
         // 释放内存
-        inline static void free(Node *block)
+        inline static void freeNode(Node *block)
         {
             destructor<Node>(block);
             dealloc(block);
@@ -161,7 +161,7 @@ namespace air
         uint getSize() const { return mList.getCount(); }
 
         // 是否为空
-        EBool isEmpty() const { return mList.getCount() == 0 ? EBool::True : EBool::False; }
+        Bool isEmpty() const { return mList.getCount() == 0 ? Bool::True : Bool::False; }
 
         // 获取第一个节点
         Type &entry() { return mList.getEntry().mData; }
@@ -184,7 +184,7 @@ namespace air
             while (entry != root)
             {
                 mList.removeEntry();
-                free(entry);
+                freeNode(entry);
                 entry = mList.front();
             }
         }
@@ -192,7 +192,7 @@ namespace air
         template <typename... Args>
         Iterator insertEntry(const Args... ele)
         {
-            auto node = get(ele...);
+            auto node = getNode(ele...);
             mList.insertEntry(node);
             return Iterator(node);
         }
@@ -200,14 +200,14 @@ namespace air
         template <typename... Args>
         Iterator insertTail(const Args... ele)
         {
-            auto node = get(ele...);
+            auto node = getNode(ele...);
             mList.insertTail(node);
             return Iterator(node);
         }
         template <typename... Args>
         Iterator insert(Iterator &iter, const Args... ele)
         {
-            auto node = get(ele...);
+            auto node = getNode(ele...);
             mList.insert(&(*iter), node);
             return Iterator(node);
         }
@@ -217,19 +217,19 @@ namespace air
         {
             auto node = mList.removeEntry();
             if (node != nullptr)
-                free(node);
+                freeNode(node);
         } // 删除
         void removeTail()
         {
             auto node = mList.removeTail();
             if (node != nullptr)
-                free(node);
+                freeNode(node);
         } // 删除
         void remove(Iterator &iter)
         {
             auto node = mList.remove(iter.mCurrent);
             if (node != nullptr)
-                free(node);
+                freeNode(node);
         }
     };
 }

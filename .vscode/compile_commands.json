@@ -1,28 +1,18 @@
 [
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-lib\\mingw\\x86_64\\debug\\src\\airAlloc.cpp.obj", "src\\airAlloc.cpp"],
-  "file": "src\\airAlloc.cpp"
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airAlloc.cpp.obj", "src\\Core\\airAlloc.cpp"],
+  "file": "src\\Core\\airAlloc.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-lib\\mingw\\x86_64\\debug\\src\\airThread.cpp.obj", "src\\airThread.cpp"],
-  "file": "src\\airThread.cpp"
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airApp.cpp.obj", "src\\Core\\airApp.cpp"],
+  "file": "src\\Core\\airApp.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-lib\\mingw\\x86_64\\debug\\PlatWin\\airLoger.cpp.obj", "PlatWin\\airLoger.cpp"],
-  "file": "PlatWin\\airLoger.cpp"
-},
-{
-  "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\airAlloc.cpp.obj", "src\\airAlloc.cpp"],
-  "file": "src\\airAlloc.cpp"
-},
-{
-  "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\airThread.cpp.obj", "src\\airThread.cpp"],
-  "file": "src\\airThread.cpp"
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airThread.cpp.obj", "src\\Core\\airThread.cpp"],
+  "file": "src\\Core\\airThread.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
