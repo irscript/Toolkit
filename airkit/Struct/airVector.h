@@ -7,6 +7,7 @@ namespace air
     template <typename Type>
     class Vector
     {
+    public:
     };
 }
 #endif //!__AIRVECTOR__H__

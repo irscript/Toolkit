@@ -6,7 +6,12 @@
 
 namespace air
 {
-
+    void assertion(cstring szExp, cstring szFile, cstring szFunc, int line)
+    {
+        // 跟踪日志系统
+        errlog("Assertion failed!\n\texp: %s\n\tfile:%s\n\tfunc: %s\n\tline: %d\n", szExp, szFile, szFunc, line);
+        exit(-1);
+    }
 // 池地址对齐大小
 #define _area_pool_base (0x1000) // 4k
 // 巨页内存大小
@@ -250,7 +255,7 @@ namespace air
         memlog.start();
         auto id = Thread::getCurrentThreadID();
         // memlog.print2("");
-        memlog.append("------------------checking-free-start[ thread:0x%lx ]---------------------\n", id);
+        memlog.append("\n\n------------------checking-free-start[ thread:0x%lx ]---------------------\n", id);
 
         // 通用内存块
         for (uint i = 0; i < _pool_count; ++i)
@@ -266,8 +271,8 @@ namespace air
                 ++dbgcnt;
             }
         }
-        memlog.append("\n------------------checking-big-free----------------------\n");
-        // 大内存
+        // memlog.append("\n------------------checking-big-free----------------------\n");
+        //  大内存
         for (auto iter = mBigslist.getEntry();
              iter != mBigslist.getRoot();
              iter = iter->getNext())
@@ -278,8 +283,7 @@ namespace air
             ++dbgcnt;
         }
         memlog.append("\nchecking-free-count: %ld\n\n", dbgcnt);
-        // memlog.print2("");
-        memlog.append("------------------checking-free-end[ thread:0x%lx ]----------------------\n", id);
+        memlog.append("------------------checking-free-end[ thread:0x%lx ]----------------------\n\n\n", id);
         memlog.end();
 #endif
     }
@@ -490,6 +494,8 @@ namespace air
 
     void dealloc(uintptr block)
     {
+        if (block == nullptr)
+            return;
         auto &memsys = MemAlloctorTLS::mTLS.instance();
         memsys.dealloctor(block);
     }

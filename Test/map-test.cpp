@@ -61,13 +61,23 @@ public:
             set.remove(itf);
         set.insert(10, 110);
         // 打印
-        for (auto it = set.begin(); it != set.end(); ++it)
-            printf("[key:%d val:%d clr:%d]\t", it.key(), it.value(), (*it).getColor());
+        int i=0;
+        for (auto it = set.begin(); it != set.end(); ++i,++it)
+        {
+            // printf("[key:%d val:%d clr:%d]\t", it.key(), it.value(), (*it).getColor());
+            auto left = (*it).getLeft();
+            auto right = (*it).getRight();
+            auto root = (*it).getParent();
+            printf("%d\t[key:%d val:%d clr:%d\tleft:%d\tparent:%d\tright:%d]\n",i,
+                   it.key(), it.value(), (*it).getColor(),
+                   left != nullptr ? left->mKey : -1, root != nullptr ? root->mKey : -1, right != nullptr ? right->mKey : -1);
+        }
+
         printf("\ncount:%lld\n", set.getCount());
         printf("min: [key:%d val:%d clr:%d] root: [key:%d val:%d clr:%d] max:[key:%d val:%d clr:%d]\n",
-               set.getMin().key(), set.getMin().value(),(*set.getMin()).getColor(),
-               set.getRoot().key(), set.getRoot().value(),(*set.getRoot()).getColor(),
-               set.getMax().key(), set.getMax().value(),(*set.getMax()).getColor());
+               set.getMin().key(), set.getMin().value(), (*set.getMin()).getColor(),
+               set.getRoot().key(), set.getRoot().value(), (*set.getRoot()).getColor(),
+               set.getMax().key(), set.getMax().value(), (*set.getMax()).getColor());
         printf("清空数据\n");
         set.clear();
         for (auto it = set.begin(); it != set.end(); ++it)

@@ -265,7 +265,12 @@ namespace air
                                 rbros->getLeft()->setBlack();
                             rbros->setRed();
                             rotateRight(rbros);
+                            parent = node->getParent();
+                            if (parent == nullptr)
+                                return;
                             rbros = parent->getRight();
+                            if (rbros == nullptr)
+                                return;
                         }
                         rbros->setColor(parent->getColor()); // A:case 4
                         parent->setBlack();
@@ -284,8 +289,8 @@ namespace air
                     // node的兄弟节点 lbros 是红色
                     if (lbros->isRed() == true) // B: case 1
                     {
-                        lbros->setBlack();              // 置黑
-                        lbros->getParent()->setRed();   // 置红
+                        lbros->setBlack();               // 置黑
+                        lbros->getParent()->setRed();    // 置红
                         rotateRight(lbros->getParent()); // 父节点左旋
                         lbros = parent->getLeft();
                         if (lbros == nullptr)
@@ -308,7 +313,12 @@ namespace air
                                 lbros->getRight()->setBlack();
                             lbros->setRed();
                             rotateLeft(lbros);
+                            parent = node->getParent();
+                            if (parent == nullptr)
+                                return;
                             lbros = parent->getLeft();
+                            if (lbros == nullptr)
+                                return;
                         }
                         // B: case 4
                         lbros->setColor(parent->getColor());

@@ -8,6 +8,8 @@
         "string_view": "cpp",
         "initializer_list": "cpp",
         "new": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "source_location": "cpp",
+        "random": "cpp"
     }
 }

@@ -6,6 +6,8 @@
 // 内存分配器
 namespace air
 {
+
+    void assertion(cstring szExp,cstring szFile,cstring szFunc,int line);
     //_check_memory_free:检查内存释放情况
     // 初始化内存系统
     void initMemSys();
@@ -66,7 +68,7 @@ namespace air
     {
         // 获取内存
         template <typename Type, typename... Args>
-        inline static Type *get(Args... args)
+        inline static Type *getOne(Args... args)
         {
             auto obj = (Type *)alloc(sizeof(Type));
             constructor<Type>(obj, args...);
@@ -74,7 +76,7 @@ namespace air
         }
         // 释放内存
         template <typename Type>
-        inline static void free(Type *block)
+        inline static void freeOne(Type *block)
         {
             destructor<Type>(block);
             dealloc(block);

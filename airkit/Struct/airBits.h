@@ -3,15 +3,43 @@
 #include <airkit/Core/airTypes.h>
 namespace air
 {
-
+    // 固定位集合
     template <const uint bits>
-    struct Bits
+    struct Bitset
     {
         enum
         {
-            BitsCnt = alignup<uint>(bits, 8)
+            BitsCnt = alignup<uint>(bits, 8), // 位对齐
+            ByteCcnt = BitsCnt / 8,           // 字节数
         };
-        uint8 mByte[BitsCnt];
+
+        Bitset() { memset(&mByte, 0, ByteCcnt); }
+        ~Bitset() {}
+
+        void set(uint index)
+        {
+            make_ensure(index < BitsCnt);
+            const uint byte = index / 8;
+            const uint bit = index % 8;
+            mByte[byte] |= (1 << bit);
+        }
+        void unset(uint index)
+        {
+            make_ensure(index < BitsCnt);
+            const uint byte = index / 8;
+            const uint bit = index % 8;
+            mByte[byte] &= ~(1 << bit);
+        }
+        uint get(uint index)
+        {
+            make_ensure(index < BitsCnt);
+            const uint byte = index / 8;
+            const uint bit = index % 8;
+            return mByte[byte] & (1 << bit);
+        }
+
+    protected:
+        uint8 mByte[ByteCcnt];
     };
 
     // 位转换

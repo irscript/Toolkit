@@ -40,12 +40,12 @@ namespace air
         inline Holder(Type *ref) : mRefObj(ref)
         {
             if (ref != nullptr)
-                ref->grab();
+                mRefObj->grab();
         }
         inline Holder(Holder &ref) : mRefObj(ref.mRefObj)
         {
             if (mRefObj != nullptr)
-                ref->grab();
+                mRefObj->grab();
         }
         inline ~Holder()
         {
@@ -56,10 +56,10 @@ namespace air
         inline Holder &operator=(Holder &rhs)
         {
             if (mRefObj != nullptr)
-                ref->drop();
-            mRefObj = ref.mRefObj;
+                mRefObj->drop();
+            mRefObj = rhs.mRefObj;
             if (mRefObj != nullptr)
-                ref->grab();
+                mRefObj->grab();
         }
         inline Type &operator*() { return *mRefObj; }
         inline Type *operator->() { return mRefObj; }

@@ -8,6 +8,10 @@ namespace air
     SLoger print(nullptr, SLoger::White);
 
     SLoger memlog("MemSys", SLoger::LightRed);
+    SLoger errlog("Error", SLoger::LightRed);
+    SLoger warnlog("Warning", SLoger::FaintYellow);
+    SLoger infolog("Info", SLoger::BrightWhite);
+
 #ifdef _check_trace_log
     SLoger tracelog("Trace", SLoger::Aqua);
 #endif
@@ -21,7 +25,7 @@ namespace air
         if (mPrev != nullptr)
             printf("[ %s ]: %s\n", mPrev, msg);
         else
-            printf(msg);
+            printf("%s\n", msg);
         mLock.unlock();
     }
     // 打印日志

@@ -63,11 +63,15 @@ namespace air
     extern SLoger print;
     // 内存日志系统
     extern SLoger memlog;
-
+    extern SLoger errlog;
+    extern SLoger warnlog;
+    extern SLoger infolog;
     // 开启跟踪日志系统
 #ifdef _check_trace_log
     // 跟踪日志系统
     extern SLoger tracelog;
+#else
+#define tracelog(...)
 #endif
 }
 

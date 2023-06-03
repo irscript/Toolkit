@@ -45,15 +45,15 @@ namespace air
         constexpr flt32 cFlt32PIHalf = cFlt32PI / 2.0f;
 
         constexpr flt64 cFlt64PI = 3.1415926535897932384626433832795028841971693993751;
-        constexpr flt64 cFlt64PIInv = 1.0f / cFlt64PI;
-        constexpr flt64 cFlt64PIHalf = cFlt64PI / 2.0f;
+        constexpr flt64 cFlt64PIInv = 1.0 / cFlt64PI;
+        constexpr flt64 cFlt64PIHalf = cFlt64PI / 2.0;
 
         // 角度和弧度转换
-        constexpr flt32 cFlt32Deg2Rad = cFlt32PI / 180.f;
+        constexpr flt32 cFlt32Deg2Rad = cFlt32PI / 180.0f;
         constexpr flt32 cFlt32Rad2Deg = 180.0f / cFlt32PI;
 
-        constexpr flt64 cFlt64Deg2Rad = cFlt64PI / 180.f;
-        constexpr flt64 cFlt64Rad2Deg = 180.0f / cFlt64PI;
+        constexpr flt64 cFlt64Deg2Rad = cFlt64PI / 180.0;
+        constexpr flt64 cFlt64Rad2Deg = 180.0 / cFlt64PI;
 
         inline constexpr flt32 rad2deg(flt32 radins) { return cFlt32Rad2Deg * radins; }
         inline constexpr flt64 rad2deg(flt64 radins) { return cFlt64Rad2Deg * radins; }
@@ -63,14 +63,13 @@ namespace air
 
         // 基本类型等于判断
         template <typename Type>
-        inline Bool equals(Type left, Type right) { return left == right ? Bool::True : Bool::False; }
+        inline bool equals(Type left, Type right) { return left == right; }
 
         // 浮点特化
         template <>
-        inline Bool equals(flt32 left, flt32 right) { return (left + cFlt32Epsilon >= right) && (left - cFlt32Epsilon <= right) ? Bool::True : Bool::False; }
+        inline bool equals(flt32 left, flt32 right) { return (left + cFlt32Epsilon >= right) && (left - cFlt32Epsilon <= right); }
         template <>
-        inline Bool equals(flt64 left, flt64 right) { return (left + cFlt64Epsilon >= right) && (left - cFlt64Epsilon <= right) ? Bool::True : Bool::False; }
-
+        inline bool equals(flt64 left, flt64 right) { return (left + cFlt64Epsilon >= right) && (left - cFlt64Epsilon <= right); }
         // 获取最小值
         template <typename Type>
         inline const Type &min(const Type &a, const Type &b) { return a < b ? a : b; }

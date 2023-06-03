@@ -58,8 +58,9 @@ namespace air
     // 向下大小对齐
     template <typename T>
     inline constexpr T aligndown(T num, T base) { return (num & ~(base - 1)); }
-    
+
     // 生成ID
+    inline constexpr uint16 makeID16(uint32 b1, uint32 b2) { return b1 << 8 | b2; }
     inline constexpr uint32 makeID32(uint32 b1, uint32 b2, uint32 b3, uint32 b4) { return b1 << 24 | b2 << 16 | b3 << 8 | b4; }
     inline constexpr uint64 makeID64(uint64 b1, uint64 b2, uint64 b3, uint64 b4,
                                      uint64 b5, uint64 b6, uint64 b7, uint64 b8) { return b1 << 56 | b2 << 48 | b3 << 40 | b4 << 36 |
@@ -69,9 +70,9 @@ namespace air
     inline constexpr uint64 bits64(uint32 offset) { return 1ull << offset; }
 
 //-------通用宏定义
-#define this_file() __FILE__
+#define this_file() __builtin_FILE()
 #define this_line() __LINE__
-#define this_func() __FUNCTION__
+#define this_func() __PRETTY_FUNCTION__
 
 // 求数组维度
 #define array_size(obj, type) (sizeof(obj) / sizeof(type))
