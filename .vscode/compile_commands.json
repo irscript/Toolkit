@@ -31,6 +31,6 @@
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\main.cpp.obj", "Test\\main.cpp"],
-  "file": "Test\\main.cpp"
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\set-test.cpp.obj", "Test\\set-test.cpp"],
+  "file": "Test\\set-test.cpp"
 }]

@@ -17,24 +17,24 @@ namespace air
             inline Node() : IListNode<Node>() {}
             inline Node(const Type &ele) : IListNode<Node>() { constructor<Type>(&mData, ele); }
         };
-        IList<Node> mList; // 链表管理
+        IList<Node> mList;        // 链表管理
+        Alloctor<Node> mAlloctor; // 内存分配器
 
         // 获取内存
         template <typename... Args>
-        inline static Node *getNode(Args... args)
+        inline Node *getNode(Args... args)
         {
-            auto obj = (Node *)alloc(sizeof(Node));
-            /*if (sizeof... (args) == 0)
-                constructor<Type>(obj);
-            else*/
-            constructor<Node>(obj, args...);
+            auto obj = mAlloctor.alloc(
+#ifdef _check_memory_free
+                this_file(), this_line(),
+#endif
+                args...);
             return obj;
         }
         // 释放内存
-        inline static void freeNode(Node *block)
+        inline void freeNode(Node *block)
         {
-            destructor<Node>(block);
-            dealloc(block);
+            mAlloctor.dealloc(block);
         }
 
     public:

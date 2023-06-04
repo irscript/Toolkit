@@ -77,7 +77,7 @@ namespace air
     };
 
     // 通用内存分配器
-    struct MemAlloctor
+    struct MemAlloctor : public IAlloctor
     {
         inline MemAlloctor() {}
         inline ~MemAlloctor() {}
@@ -476,28 +476,9 @@ namespace air
         MemAlloctorTLS::mTLS.terminal();
         MemAlloctor::mCenter.terminal();
     }
-#ifdef _check_memory_free
-    uintptr alloc_(uint size, cstring filepos, uint32 linepos)
-#else
-    uintptr alloc(uint size)
-#endif
+    IAlloctor &getThreadAlloctor()
     {
-        auto &memsys = MemAlloctorTLS::mTLS.instance();
-        return memsys.alloctor(size
-#ifdef _check_memory_free
-                               ,
-                               filepos, linepos
-#endif
-        );
-        return nullptr;
-    }
-
-    void dealloc(uintptr block)
-    {
-        if (block == nullptr)
-            return;
-        auto &memsys = MemAlloctorTLS::mTLS.instance();
-        memsys.dealloctor(block);
+        return MemAlloctorTLS::mTLS.instance();
     }
     void checkMemSys()
     {

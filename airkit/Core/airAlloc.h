@@ -7,7 +7,7 @@
 namespace air
 {
 
-    void assertion(cstring szExp,cstring szFile,cstring szFunc,int line);
+    void assertion(cstring szExp, cstring szFile, cstring szFunc, int line);
     //_check_memory_free:检查内存释放情况
     // 初始化内存系统
     void initMemSys();
@@ -17,71 +17,93 @@ namespace air
     // 打印内存bug信息
     void checkMemSys();
 
-// 内存分配
-#ifdef _check_memory_free
-    uintptr alloc_(uint size, cstring filepos, uint32 linepos);
-#define alloc(size) alloc_(size, this_file(), this_line())
-#else
-    uintptr alloc(uint size);
-#endif
-    void dealloc(uintptr block);
-
-    // 线程局部变量模板封装
-    template <class Type>
-    class ThreadLocal
+    // 内存分配接口
+    struct IAlloctor
     {
-    public:
-        ThreadLocal()
-            : mInstance(ThreadLocal::destroy) {}
 
-        Type &instance()
-        {
-            Type *obj = (Type *)mInstance.get();
-            if (obj == nullptr)
-            {
-                obj = (Type *)alloc(sizeof(Type));
-                constructor<Type>(obj);
-                mInstance.set(obj);
-            }
-            return *obj;
-        }
+        virtual uintptr alloctor(uint size
+#ifdef _check_memory_free
+                                 ,
+                                 cstring filepos, uint32 linepos
+#endif
+                                 ) = 0;
 
-    private:
-        TLSV mInstance;
-
-        ThreadLocal(const ThreadLocal &) = delete;
-        ThreadLocal &operator=(const ThreadLocal &) = delete;
-        // 内存释放
-        static void destroy(uintptr ins)
-        {
-            if (ins != nullptr)
-            {
-                Type *obj = (Type *)ins;
-                destructor<Type>(obj);
-                dealloc(obj);
-            }
-        }
+        virtual void dealloctor(uintptr block) = 0;
     };
-
+    // 获取当前线程的内存分配器
+    IAlloctor &getThreadAlloctor();
     // 内存分配器
+    template <typename Type>
     struct Alloctor
     {
+        Alloctor() : mInstance(getThreadAlloctor()) {}
         // 获取内存
-        template <typename Type, typename... Args>
-        inline static Type *getOne(Args... args)
+        template <typename... Args>
+        inline Type *alloc(
+#ifdef _check_memory_free
+            cstring filepos, uint32 linepos,
+#endif
+            Args... args)
         {
-            auto obj = (Type *)alloc(sizeof(Type));
+            auto obj =
+                (Type *)mInstance.alloctor(sizeof(Type)
+#ifdef _check_memory_free
+                                               ,
+                                           filepos, linepos
+#endif
+                );
             constructor<Type>(obj, args...);
             return obj;
         }
+        inline Type* allocArr(
+            uint count
+#ifdef _check_memory_free
+            ,cstring filepos, uint32 linepos
+#endif
+)
+        {
+            return (Type *)mInstance.alloctor(sizeof(Type) * count
+#ifdef _check_memory_free
+                                              ,
+                                              filepos, linepos
+#endif
+            );
+        }
         // 释放内存
-        template <typename Type>
-        inline static void freeOne(Type *block)
+
+        inline void dealloc(Type *block)
         {
             destructor<Type>(block);
-            dealloc(block);
+            mInstance.dealloctor(block);
         }
+
+    protected:
+        IAlloctor &mInstance; // 分配器实例
     };
+
+    //====================线程局部的内存分配管理器===========================
+
+    // 线程内存分配
+#ifdef _check_memory_free
+#define talloc(size) alloc_(size, this_file(), this_line())
+    inline uintptr alloc_(uint size, cstring filepos, uint32 linepos)
+    {
+        make_ensure(size != 0);
+        return getThreadAlloctor().alloctor(size, filepos, linepos);
+    }
+#else
+    inline uintptr alloc(uint size)
+    {
+        make_ensure(size != 0);
+        return getThreadAlloctor().alloctor(size);
+    }
+#endif
+    // 线程内存释放
+    inline void tdealloc(uintptr block)
+    {
+        if (block != nullptr)
+            getThreadAlloctor().dealloctor(block);
+    }
 
 }
 

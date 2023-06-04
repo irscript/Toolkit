@@ -20,18 +20,18 @@ public:
         for (int32 i = 0; i < 64; ++i)
         {
             auto size = sizeof(uint32) * (i + 1);
-            arr[i] = (uint32 *)alloc(size);
+            arr[i] = (uint32 *)talloc(size);
             *arr[i] = size;
         }
         for (int32 i = 0; i < 64; ++i)
         {
             memlog("ID:%lx\t size = %d\n", Thread::getCurrentThreadID(), *arr[i]);
         }
-        uintptr big = alloc(sizeof(uint32) * 1024);
-        dealloc(big);
+        uintptr big = talloc(sizeof(uint32) * 1024);
+        tdealloc(big);
         for (int32 i = 0; i < 64; ++i)
         {
-            dealloc(arr[i]);
+            tdealloc(arr[i]);
         }
 
         return 0;
@@ -46,7 +46,7 @@ void apprun()
     tp.start();
     tp2.start();
     tp3.start();
-    tp3.start(EBool::False);
+    tp3.start(Bool::False);
     tp3.detach();
     memlog.end();
 
@@ -55,19 +55,19 @@ void apprun()
     for (int32 i = 0; i < 64; ++i)
     {
         auto size = sizeof(uint32) * (i + 1);
-        arr[i] = (uint32 *)alloc(size);
+        arr[i] = (uint32 *)talloc(size);
         *arr[i] = size;
     }
     for (int32 i = 0; i < 64; ++i)
     {
         memlog("ID:%lx\t size = %d\n", Thread::getCurrentThreadID(), *arr[i]);
     }
-    uintptr big = alloc(sizeof(uint32) * 1024);
+    uintptr big = talloc(sizeof(uint32) * 1024);
 
     for (int32 i = 0; i < 64; ++i)
     {
-        dealloc(arr[i]);
-    }dealloc(big);
+        tdealloc(arr[i]);
+    }tdealloc(big);
 }
 
 int main(int argc, char *argv[])

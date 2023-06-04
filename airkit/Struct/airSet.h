@@ -2,6 +2,8 @@
 #define __AIRSET__H__
 
 #include <airkit/Struct/airRBTree.h>
+#include <airkit/Core/airAlloc.h>
+
 namespace air
 {
     template <typename Type>
@@ -19,19 +21,23 @@ namespace air
 
         // 红黑树
         RBTree<Node> mTree;
+        Alloctor<Node> mAlloctor; // 内存分配器
+
         // 获取内存
         template <typename... Args>
-        inline static Node *getNode(Args... args)
+        inline Node *getNode(Args... args)
         {
-            auto obj = (Node *)alloc(sizeof(Node));
-            constructor<Node>(obj, args...);
+            auto obj = (Node *)mAlloctor.alloc(
+#ifdef _check_memory_free
+                this_file(), this_line(),
+#endif
+                args...);
             return obj;
         }
         // 释放内存
-        inline static void freeNode(Node *block)
+        inline void freeNode(Node *block)
         {
-            destructor<Node>(block);
-            dealloc(block);
+            mAlloctor.dealloc(block);
         }
 
         // 清空节点

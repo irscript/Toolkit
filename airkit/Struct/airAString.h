@@ -18,7 +18,7 @@ namespace air
         uint8 mData[]; // 字符串内容
 
         // 释放内存
-        inline void release() { dealloc(this); }
+        inline void release() { tdealloc(this); }
 
         // 生成字符串
         static const AString *make(cstring szStr);

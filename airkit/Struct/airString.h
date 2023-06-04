@@ -41,6 +41,7 @@ namespace air
         TString() : mCapc(0), mSize(0), mData(nullptr) {}
         ~TString() { clear(); }
         TString(const TString &other) : TString() { *this = other; }
+        TString(const Type *const other) : TString() { *this = other; }
 
         explicit TString(const int32 num) : TString()
         {
@@ -61,14 +62,14 @@ namespace air
 
         inline sizetype size() const { return mSize; }
         inline sizetype length() const { return mSize; }
-        inline cstring cstr() const { return mData == nullptr ? "" : (cstring)mData; }
+        inline const Type *cstr() const { return mData == nullptr ? (const Type *)("\0\0\0\0") : mData; }
         inline Type *data() { return mData; }
         inline bool empty() const { return mSize == 0; }
 
         inline void clear()
         {
             if (mData != nullptr)
-                dealloc(mData);
+                mAlloc.dealloc(mData);
             mData = nullptr;
             mCapc = 0;
             mSize = 0;
@@ -172,7 +173,7 @@ namespace air
          * @param start ：查询的起始位置
          * @return 没有查到返回 -1，否则返回具体位置
          */
-        sizetype find(TString &str, sizetype start = 0) const
+        sizetype find(const TString &str, sizetype start = 0) const
         {
             if (str.mData == mData)
                 return 0;
@@ -242,8 +243,8 @@ namespace air
          */
         sizetype findLast(Type ch, sizetype start = -1) const
         {
-            if (start > mSize)
-                start = mSize;
+            if (start >= mSize)
+                start = mSize - 1;
             for (sizetype i = start; i >= 0; --i)
                 if (mData[i] == ch)
                     return i;
@@ -258,17 +259,16 @@ namespace air
          */
         sizetype matchFirst(const Type *const list, sizetype count = 1, sizetype start = 0) const
         {
-            if (list != nullptr && count != 0)
+            if (list != nullptr && count != 0 && start <= mSize)
             {
-                if (start > mSize)
-                    start = mSize;
-                for (sizetype i = 0; i < start; ++i)
+                for (sizetype i = start; i < mSize; ++i)
                     for (sizetype j = 0; j < count; ++j)
                         if (mData[i] == list[j])
                             return i;
             }
             return -1;
         }
+        inline sizetype matchFirst(const TString &list, sizetype start = 0) const { return matchFirst(list.mData, list.mSize, start); }
         /**
          * @brief 前向匹配不存在字符列表的字符
          * @param list ：带匹配的字符列表
@@ -278,17 +278,21 @@ namespace air
          */
         sizetype matchFirstNot(const Type *const list, sizetype count = 1, sizetype start = 0) const
         {
-            if (list != nullptr && count != 0)
+            if (list != nullptr && count != 0 && start <= mSize)
             {
-                if (start > mSize)
-                    start = mSize;
-                for (sizetype i = 0; i < start; ++i)
-                    for (sizetype j = 0; j < count; ++j)
-                        if (mData[i] != list[j])
-                            return i;
+                for (sizetype i = start; i < mSize; ++i)
+                {
+                    sizetype j = 0;
+                    for (; j < count; ++j)
+                        if (mData[i] == list[j])
+                            break;
+                    if (j == count)
+                        return i;
+                }
             }
             return -1;
         }
+        inline sizetype matchFirstNot(const TString &list, sizetype start = 0) const { return matchFirstNot(list.mData, list.mSize, start); }
 
         /**
          * @brief 逆向匹配存在字符列表的字符
@@ -301,35 +305,42 @@ namespace air
         {
             if (list != nullptr && count != 0)
             {
-                if (start > mSize)
-                    start = mSize;
+                if (start >= mSize)
+                    start = mSize - 1;
                 for (sizetype i = start; i >= 0; --i)
                     for (sizetype j = 0; j < count; ++j)
                         if (mData[i] == list[j])
                             return i;
             }
             return -1;
-        } /**
-           * @brief 逆向匹配不存在字符列表的字符
-           * @param list ：带匹配的字符列表
-           * @param count ：字符列表长度
-           *  @param start :开始查找的位置
-           * @return 没有匹配返回 -1，否则返回具体位置
-           */
+        }
+        inline sizetype matchLast(const TString &list, sizetype start = -1) const { return matchLast(list.mData, list.mSize, start); }
+        /**
+         * @brief 逆向匹配不存在字符列表的字符
+         * @param list ：带匹配的字符列表
+         * @param count ：字符列表长度
+         *  @param start :开始查找的位置
+         * @return 没有匹配返回 -1，否则返回具体位置
+         */
         sizetype matchLastNot(const Type *const list, sizetype count = 1, sizetype start = -1) const
         {
             if (list != nullptr && count != 0)
             {
-                if (start > mSize)
-                    start = mSize;
+                if (start >= mSize)
+                    start = mSize - 1;
                 for (sizetype i = start; i >= 0; --i)
-                    for (sizetype j = 0; j < count; ++j)
-                        if (mData[i] != list[j])
-                            return i;
+                {
+                    sizetype j = 0;
+                    for (; j < count; ++j)
+                        if (mData[i] == list[j])
+                            break;
+                    if (j == count)
+                        return i;
+                }
             }
             return -1;
         }
-
+        inline sizetype matchLastNot(const TString &list, sizetype start = -1) const { return matchLastNot(list.mData, list.mSize, start); }
         /**
          * @brief 获取子字符串
          * @param start ：获取的起始位置
@@ -345,8 +356,9 @@ namespace air
                     length = mSize - start;
                 // 确保长度
                 ret.reserve(length);
-                for (sizetype i = 0; i < length; ++i)
-                    ret.mData[i] = mData[i + start];
+                memcpy(ret.mData, &mData[start], length);
+                /* for (sizetype i = 0; i < length; ++i)
+                     ret.mData[i] = mData[i + start];*/
                 ret.mSize = length;
                 ret.mData[length] = 0;
             }
@@ -356,11 +368,12 @@ namespace air
          * @brief 替换字符
          * @param toReplace ：需要替换的字符
          * @param replaceWith ：用于替换的字符
+         * @param start ：替换的起始位置
          * @return 替换后的字符串
          */
-        TString &replace(Type toReplace, Type replaceWith)
+        TString &replace(Type toReplace, Type replaceWith, sizetype start = 0)
         {
-            for (sizetype i = 0; i < mSize; ++i)
+            for (sizetype i = start; i < mSize; ++i)
                 if (mData[i] == toReplace)
                     mData[i] = replaceWith;
             return *this;
@@ -369,14 +382,219 @@ namespace air
          * @brief 替换字符串
          * @param oldch ：需要替换的字符串
          * @param replaceWith ：用于替换的字符串
+         * @param start ：替换的起始位置
          * @return 替换后的字符串
          */
-        TString &replace(const TString &toReplace, const TString &replaceWith)
+        TString &replace(const TString &toReplace, const TString &replaceWith, sizetype start = 0)
         {
-            if (toReplace.mSize != 0)
+            if (toReplace.mSize == 0 || mSize == 0)
+                return *this;
+
+            const Type *other = toReplace.cstr();
+            const Type *replace = replaceWith.cstr();
+            const sizetype othersize = toReplace.mSize;
+            const sizetype replacesize = replaceWith.mSize;
+
+            int64 delta = replacesize - othersize;
+
+            // 情况1：相当于字符替换，字符串长度不会变化
+            if (delta == 0)
             {
+                sizetype pos = start;
+                while ((pos = find(toReplace, pos)) != -1)
+                {
+                    for (sizetype i = 0; i < replacesize; ++i)
+                        mData[pos + i] = replace[i];
+                    ++pos;
+                }
+
+                return *this;
+            }
+            // 情况2：字符串长度减少
+            if (delta < 0)
+            {
+                sizetype i = start, find = 0;
+                for (sizetype pos = start; pos < mSize; ++i, ++pos)
+                {
+                    // 尝试匹配字符串
+                    if (mData[pos] == other[0])
+                    {
+                        sizetype j = 0;
+                        for (; j < othersize; ++j)
+                            if (mData[pos + j] != other[j])
+                                break;
+                        // 存在匹配，替换字符串
+                        if (j == othersize)
+                        {
+                            ++find;
+                            for (j = 0; j < replacesize; ++j)
+                                mData[i + j] = replace[j];
+                            i += replacesize - 1;
+                            pos += othersize - 1;
+                            continue;
+                        }
+                    }
+                    // 不存在就复制字符
+                    mData[i] = mData[pos];
+                }
+                mData[i] = 0;
+                mSize = i;
+                return *this;
             }
 
+            // 情况3：字符串长度增加
+
+            // 先确保内存足够
+            sizetype findcount = 0;
+            sizetype pos = start;
+            while ((pos = find(toReplace, pos)) != -1)
+            {
+                ++findcount;
+                ++pos;
+            }
+            // 分配内存
+            sizetype len = delta * findcount + mSize + 1;
+            if (len > mCapc)
+                realloc(len);
+
+            // 开始替换字符串
+            pos = start;
+            while ((pos = find(toReplace, pos)) != -1)
+            {
+                Type *start = mData + pos + othersize - 1;
+                Type *ptr = mData + mSize;
+                Type *end = mData + delta + mSize;
+
+                // 移动字符以为替换字符串腾出空间。
+                while (ptr != start)
+                {
+                    *end = *ptr;
+                    --ptr;
+                    --end;
+                }
+
+                // 添加字符
+                for (sizetype i = 0; i < replacesize; ++i)
+                    mData[pos + i] = replace[i];
+
+                pos += replacesize;
+                mSize += delta;
+            }
+            return *this;
+        }
+
+        /**
+         * @brief 移除字符
+         * @param ch ：需要移除的字符
+         * @param start ：移除的起始位置
+         * @return 移除后的字符串
+         */
+        TString &remove(const Type ch, sizetype start = 0)
+        {
+            sizetype pos = start, find = 0;
+            for (sizetype i = start; i < mSize; ++i)
+            {
+                if (mData[i] == ch)
+                {
+                    ++find;
+                    continue;
+                }
+                mData[pos++] = mData[i];
+            }
+            mSize -= find;
+            mData[mSize] = 0;
+            return *this;
+        }
+        /**
+         * @brief 移除字符字符串
+         * @param toRemove ：需要移除的字符串
+         * @param start ：移除的起始位置
+         * @return 移除后的字符串
+         */
+        TString &remove(const TString &toRemove, sizetype start = 0)
+        {
+            if (toRemove.mSize != 0)
+            {
+                sizetype pos = start, find = 0;
+                for (sizetype i = start; i < mSize; ++i)
+                {
+                    sizetype j = 0;
+                    while (j < toRemove.mSize)
+                    {
+                        if (mData[i + j] != toRemove.mData[j])
+                            break;
+                        ++j;
+                    }
+                    if (j == toRemove.mSize)
+                    {
+                        find += toRemove.mSize;
+                        i += toRemove.mSize - 1;
+                        continue;
+                    }
+
+                    mData[pos++] = mData[i];
+                }
+                mSize -= find;
+                mData[mSize] = 0;
+            }
+
+            return *this;
+        }
+        /**
+         * @brief 休整字符串，去掉头尾的休整字符
+         * @param whitespace :需要休整的字符列表
+         * @return 休整后的字符串
+         */
+        TString &trim(const TString &list = " \t\r\n")
+        {
+            sizetype begin = matchFirstNot(list);
+            if (begin == -1)
+                return *this;
+
+            sizetype end = matchLastNot(list);
+            if (end == -1)
+                end = mSize;
+            *this = substr(begin, end - begin);
+
+            return *this;
+        }
+        /**
+         * @brief 擦除字符
+         * @param index ：擦除的位置索引
+         * @return 擦除·后的字符串
+         */
+        TString &erase(sizetype index)
+        {
+            make_ensure(index < mSize);
+
+            for (sizetype i = index; i <= mSize; ++i)
+                mData[i - 1] = mData[i];
+            --mSize;
+            return *this;
+        }
+        /**
+         * @brief 验证字符串是否有效
+         * @return 有效字符串
+         */
+        TString &validate()
+        {
+            // 存在空字符
+            for (sizetype i = 0; i < mCapc; ++i)
+            {
+                if (mData[i] == 0)
+                {
+                    mSize = i;
+                    return *this;
+                }
+            }
+            // 无结尾空字符
+            if (mCapc > 0)
+            {
+                mSize = mCapc - 1;
+                mData[mSize] = 0;
+            }
+            else
+                clear();
             return *this;
         }
 
@@ -386,7 +604,7 @@ namespace air
             if (rhs == nullptr)
             {
                 if (mData != nullptr)
-                    dealloc(mData);
+                    mAlloc.dealloc(mData);
                 mData = nullptr;
                 mCapc = 0;
                 mSize = 0;
@@ -405,12 +623,17 @@ namespace air
                 {
                     mCapc = len;
                     mCapc = alignup<sizetype>(mCapc, 4);
-                    mData = (Type *)alloc(mCapc * sizeof(Type));
+                    mData = (Type *)mAlloc.allocArr(mCapc
+#ifdef _check_memory_free
+                                                    ,
+                                                    this_file(), this_line()
+#endif
+                    );
                 }
                 memcpy(mData, rhs, len);
                 mSize = len - 1;
                 if (old != nullptr && old != mData)
-                    dealloc(old);
+                    mAlloc.dealloc(old);
             }
             return *this;
         }
@@ -420,7 +643,7 @@ namespace air
             if (rhs.mData == nullptr)
             {
                 if (mData != nullptr)
-                    dealloc(mData);
+                    mAlloc.dealloc(mData);
                 mData = nullptr;
                 mCapc = 0;
                 mSize = 0;
@@ -434,12 +657,17 @@ namespace air
                 {
                     mCapc = len;
                     mCapc = alignup<sizetype>(mCapc, 4);
-                    mData = (Type *)alloc(mCapc * sizeof(Type));
+                    mData = (Type *)mAlloc.allocArr(mCapc
+#ifdef _check_memory_free
+                                                    ,
+                                                    this_file(), this_line()
+#endif
+                    );
                 }
                 memcpy(mData, rhs.mData, len);
                 mSize = len - 1;
                 if (old != nullptr && old != mData)
-                    dealloc(old);
+                    mAlloc.dealloc(old);
             }
             return *this;
         }
@@ -516,7 +744,13 @@ namespace air
             // 大小4字节对齐
             newsize = alignup<sizetype>(newsize, 4);
             // 重新分配内存
-            mData = (Type *)alloc(newsize);
+            mData = (Type *)mAlloc.allocArr(newsize
+#ifdef _check_memory_free
+                                            ,
+                                            this_file(), this_line()
+#endif
+            );
+
             mCapc = newsize;
             // 拷贝数据
             sizetype amount = mSize < newsize ? mSize : newsize;
@@ -526,10 +760,11 @@ namespace air
                 mSize = mCapc;
             // 释放内存
             if (old != nullptr)
-                dealloc(old);
+                mAlloc.dealloc(old);
         }
-        sizetype mCapc; // 缓存大小
-        sizetype mSize; // 真实大小
+        sizetype mCapc;        // 缓存大小
+        sizetype mSize;        // 真实大小
+        Alloctor<Type> mAlloc; // 内存分配器
         Type *mData;
     };
 

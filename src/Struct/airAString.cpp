@@ -11,7 +11,7 @@ namespace air
         auto length = strlen(szStr);
         auto hash = Hash::ELF((uint8 *)szStr, length);
         // 分配内存
-        auto ret = (AString *)alloc(length + sizeof(AString));
+        auto ret = (AString *)talloc(length + sizeof(AString));
         // 初始化内存
         ret->mSize = length;
         ret->mHash = hash;

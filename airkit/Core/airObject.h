@@ -23,7 +23,7 @@ namespace air
             if (mRefCnt == 0)
             {
                 destructor(this);
-                dealloc(this);
+                tdealloc(this);
             }
         }
     };
