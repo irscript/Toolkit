@@ -31,7 +31,7 @@ target("airkit-dll")
 target("test")
     set_kind("binary")
     add_deps("airkit-dll")
-    add_files("Test/set-test.cpp")
+    add_files("Test/main.cpp")
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --

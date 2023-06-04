@@ -2,6 +2,7 @@
 #include <airkit/Core/airApp.h>
 
 #include <airkit/Struct/airString.h>
+#include <airkit/Math/airMath.h>
 
 using namespace air;
 
@@ -52,6 +53,21 @@ public:
         print("\t%d", astr.length());
         print("remove-str:%s \t%d", astr.remove("00").cstr(), astr.length());
         print("\t%d", astr.length());
+        print("追加测试");
+        str = "int:";
+        str << 123 << "\tuint:" << 456u << "\tint64:" << 789ll << "\tint64:" << 789ull;
+        str << "\n\tflt32:" << 32.12345678 << "\tflt64:" << 64.12345678;
+        print("append-str:\n\t%s", str.cstr());
+        print("数学转换测试");
+        Vec2r v2(0, 2);
+        print(v2.toString().cstr());
+        Vec3r v3(0, 0, 3);
+        print(v3.toString().cstr());
+        Vec4r v4(0, 0, 0, 4);
+        print(v4.toString().cstr());
+
+        Recti ir(0, 0, 100, -100);
+        print(ir.toString().cstr());
         return 0;
     }
 };

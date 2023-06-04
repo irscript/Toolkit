@@ -1,6 +1,11 @@
 [
 {
   "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\main.cpp.obj", "Test\\main.cpp"],
+  "file": "Test\\main.cpp"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
   "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airAlloc.cpp.obj", "src\\Core\\airAlloc.cpp"],
   "file": "src\\Core\\airAlloc.cpp"
 },
@@ -28,9 +33,4 @@
   "directory": "e:\\Project\\Toolkit",
   "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\PlatWin\\airLoger.cpp.obj", "PlatWin\\airLoger.cpp"],
   "file": "PlatWin\\airLoger.cpp"
-},
-{
-  "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\set-test.cpp.obj", "Test\\set-test.cpp"],
-  "file": "Test\\set-test.cpp"
 }]

@@ -736,6 +736,137 @@ namespace air
             return !(mData[i] == 0 && rhs.mData[i] == 0);
         }
 
+        // 追加整数
+        TString &operator<<(int32 nVal)
+        {
+            Type bufer[72] = {0};
+            Type *data = bufer;
+            if (nVal == 0)
+            {
+                data[0] = '0';
+                append_(data, 1);
+                return *this;
+            }
+            // 不为 0
+            bool neg = false;
+            uint32 idx = 71;
+
+            if (nVal < 0)
+            {
+                nVal = -nVal;
+                neg = true;
+            }
+            while (nVal != 0 && idx != 0)
+            {
+                --idx;
+                bufer[idx] = (Type)('0' + (nVal % 10));
+                nVal /= 10;
+            }
+            if (neg == true)
+            {
+                --idx;
+                bufer[idx] = '-';
+            }
+            append_(&bufer[idx], 71 - idx);
+            return *this;
+        }
+        TString &operator<<(uint32 nVal)
+        {
+            Type bufer[72] = {0};
+            Type *data = bufer;
+            if (nVal == 0)
+            {
+                data[0] = '0';
+                append_(data, 1);
+                return *this;
+            }
+            // 不为 0
+            uint32 idx = 71;
+
+            while (nVal != 0 && idx != 0)
+            {
+                --idx;
+                bufer[idx] = (Type)('0' + (nVal % 10));
+                nVal /= 10;
+            }
+            append_(&bufer[idx], 71 - idx);
+            return *this;
+        }
+        TString &operator<<(int64 nVal)
+        {
+            Type bufer[72] = {0};
+            Type *data = bufer;
+            if (nVal == 0)
+            {
+                data[0] = '0';
+                append_(data, 1);
+                return *this;
+            }
+            // 不为 0
+            bool neg = false;
+            uint32 idx = 71;
+
+            if (nVal < 0)
+            {
+                nVal = -nVal;
+                neg = true;
+            }
+            while (nVal != 0 && idx != 0)
+            {
+                --idx;
+                bufer[idx] = (Type)('0' + (nVal % 10));
+                nVal /= 10;
+            }
+            if (neg == true)
+            {
+                --idx;
+                bufer[idx] = '-';
+            }
+            append_(&bufer[idx], 71 - idx);
+            return *this;
+        }
+        TString &operator<<(uint64 nVal)
+        {
+            Type bufer[72] = {0};
+            Type *data = bufer;
+            if (nVal == 0)
+            {
+                data[0] = '0';
+                append_(data, 1);
+                return *this;
+            }
+            // 不为 0
+            uint32 idx = 71;
+
+            while (nVal != 0 && idx != 0)
+            {
+                --idx;
+                bufer[idx] = (Type)('0' + (nVal % 10));
+                nVal /= 10;
+            }
+            append_(&bufer[idx], 71 - idx);
+            return *this;
+        }
+        TString &operator<<(flt32 nVal)
+        {
+            char tmpbuf[255];
+            auto res = ::snprintf(tmpbuf, 255, "%0.6f", nVal);
+            append_(tmpbuf, res);
+            return *this;
+        }
+        TString &operator<<(flt64 nVal)
+        {
+            char tmpbuf[255];
+            auto res = ::snprintf(tmpbuf, 255, "%0.8lf", nVal);
+            append_(tmpbuf, res);
+            return *this;
+        }
+        TString &operator<<(const Type *cstr)
+        {
+            append(cstr);
+            return *this;
+        }
+
     protected:
         // 重新分配内存
         void realloc(sizetype newsize)
@@ -762,6 +893,22 @@ namespace air
             if (old != nullptr)
                 mAlloc.dealloc(old);
         }
+
+        // 追加
+        void append_(const Type *data, sizetype length)
+        {
+            if (data != nullptr && length != 0)
+            {
+                const auto size = mSize + length + 1;
+                if (size >= mCapc)
+                    realloc(size);
+
+                memcpy(&mData[mSize], data, length);
+                mSize += length;
+                mData[mSize] = 0;
+            }
+        }
+
         sizetype mCapc;        // 缓存大小
         sizetype mSize;        // 真实大小
         Alloctor<Type> mAlloc; // 内存分配器
