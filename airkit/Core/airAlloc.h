@@ -34,11 +34,14 @@ namespace air
     IAlloctor &getThreadAlloctor();
     // 获取多线程分配器
     IAlloctor &getMainAlloctor();
+    // 获取标准库内存分配器
+    IAlloctor &getOSAlloctor();
     // 线程局部分配器
     enum class AlloctorType
     {
         Thread, // 线程局部分配器
         Main,   // 主线程分配器
+        OS,     // 标准库分配器
     };
 
     // 内存分配器
@@ -51,6 +54,8 @@ namespace air
                 mInstance = &getThreadAlloctor();
             else if (mem == AlloctorType::Main)
                 mInstance = &getMainAlloctor();
+            else if (mem == AlloctorType::OS)
+                mInstance = &getOSAlloctor();
         }
         // 获取内存
         template <typename... Args>

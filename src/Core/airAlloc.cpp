@@ -466,6 +466,30 @@ namespace air
         }
     }
 
+    struct OSMemAlloctor : public IAlloctor
+    {
+        uintptr alloctor(
+            uint size
+#ifdef _check_memory_free
+            ,
+            cstring filepos, uint32 linepos
+#endif
+            ) override;
+        void dealloctor(uintptr blk) override;
+
+        static OSMemAlloctor mInstance;
+    };
+    OSMemAlloctor OSMemAlloctor ::mInstance;
+    uintptr OSMemAlloctor ::alloctor(uint size
+#ifdef _check_memory_free
+                                     ,
+                                     cstring filepos, uint32 linepos
+#endif
+    )
+    {
+        return malloc(size);
+    }
+    void OSMemAlloctor ::dealloctor(uintptr blk) { free(blk); }
     // 多线程分配器
     struct MuitlMemAlloctor : public MemAlloctor
     {
@@ -592,6 +616,10 @@ namespace air
     {
         return MuitlMemAlloctor::mInstance;
     }
+    IAlloctor &getOSAlloctor()
+    {
+        return OSMemAlloctor ::mInstance;
+    };
     void checkMemSys()
     {
         auto &memsys = MemAlloctorTLS::mTLS.instance();

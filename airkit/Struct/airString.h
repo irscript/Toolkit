@@ -32,7 +32,7 @@ namespace air
         inline constexpr bool isPrint(uint32 x) { return ::isprint(x); }
     }
 
-    template <typename Type, const AlloctorType mem = AlloctorType::Thread>
+    template <typename Type, const AlloctorType mem = AlloctorType::OS>
     class TString
     {
     public:

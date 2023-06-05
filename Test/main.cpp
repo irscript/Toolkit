@@ -9,11 +9,12 @@ using namespace air;
 class ThreadTask : public Thread
 {
 public:
+    static String mstr;
     ~ThreadTask() { stop(); }
     uint worker() override
     {
-        String str(0.3333f), str2(str), astr;
-        astr = "Abc";
+        String str(0.3333f), str2(str), astr = mstr;
+        // astr = "Abc";
         astr.append('d');
         astr.append("123-");
         astr.append(str);
@@ -74,16 +75,16 @@ public:
         return 0;
     }
 };
-
+String ThreadTask::mstr;
 class TestApp : public Application
 {
 public:
     virtual int32 run() override
     {
-        ThreadTask task1, task2, task3;
-        task1.start();
-        task2.start();
-        task3.start();
+        ThreadTask::mstr = "Main-App";
+        ThreadTask task;
+        task.start();
+
         return 0;
     }
 };
