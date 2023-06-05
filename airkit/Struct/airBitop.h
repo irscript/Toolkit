@@ -1,5 +1,5 @@
-#ifndef __AIRBITS__H__
-#define __AIRBITS__H__
+#ifndef __AIRBITOP__H__
+#define __AIRBITOP__H__
 #include <airkit/Core/airTypes.h>
 namespace air
 {

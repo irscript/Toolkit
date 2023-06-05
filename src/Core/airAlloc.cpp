@@ -92,14 +92,14 @@ namespace air
 
         inline void checkFree();
 
-        inline uintptr alloctor(
+        uintptr alloctor(
             uint size
 #ifdef _check_memory_free
             ,
             cstring filepos, uint32 linepos
 #endif
-        );
-        inline void dealloctor(uintptr blk);
+            ) override;
+        void dealloctor(uintptr blk) override;
     };
 
     MemPoolCenter MemAlloctor::mCenter;
@@ -367,6 +367,8 @@ namespace air
 
     void MemAlloctor::dealloctor(uintptr blk)
     {
+        if (blk == nullptr)
+            return;
         // 查找在哪个池
         uint indexpool = 0;
         PoolkHead *pools = nullptr;
@@ -463,15 +465,121 @@ namespace air
             free(obj);
         }
     }
+
+    // 多线程分配器
+    struct MuitlMemAlloctor : public MemAlloctor
+    {
+        MuitlMemAlloctor() {}
+        ~MuitlMemAlloctor() {}
+
+        Spinlock mLock; // 分配释放锁
+
+        inline void init();
+        inline void terminal();
+
+        inline void checkFree();
+
+        uintptr alloctor(
+            uint size
+#ifdef _check_memory_free
+            ,
+            cstring filepos, uint32 linepos
+#endif
+            ) override;
+        void dealloctor(uintptr blk) override;
+
+        static MuitlMemAlloctor mInstance;
+    };
+
+    MuitlMemAlloctor MuitlMemAlloctor::mInstance;
+
+    inline void MuitlMemAlloctor::init()
+    {
+        Spinlocker lock(mLock);
+        MemAlloctor::init();
+    }
+    inline void MuitlMemAlloctor::terminal()
+    {
+        Spinlocker lock(mLock);
+        MemAlloctor::terminal();
+    }
+
+    inline void MuitlMemAlloctor::checkFree()
+    {
+        Spinlocker lock(mLock);
+#ifdef _check_memory_free
+        uint dbgcnt = 0;
+        memlog.start();
+        memlog.append("\n\n------------------checking-free-start[ main ]---------------------\n");
+
+        // 通用内存块
+        for (uint i = 0; i < _pool_count; ++i)
+        {
+            auto size = (i + 1) * 8;
+            for (auto iter = mBlocklist[i].getEntry();
+                 iter != mBlocklist[i].getRoot();
+                 iter = iter->getNext())
+            {
+                memlog.append("checking-free>\taddr: 0x%lx\tsize: %d \tin [file: %s\tline: %d]!\n",
+                              iter, size,
+                              iter->mDbgFile, iter->mDbgLine);
+                ++dbgcnt;
+            }
+        }
+        // memlog.append("\n------------------checking-big-free----------------------\n");
+        //  大内存
+        for (auto iter = mBigslist.getEntry();
+             iter != mBigslist.getRoot();
+             iter = iter->getNext())
+        {
+            memlog.append("checking-big-free>\taddr: 0x%lx\tin [file: %s\tline: %d ]!\n",
+                          iter,
+                          iter->mDbgFile, iter->mDbgLine);
+            ++dbgcnt;
+        }
+        memlog.append("\nchecking-free-count: %ld\n\n", dbgcnt);
+        memlog.append("------------------checking-free-end[ main ]----------------------\n\n\n");
+        memlog.end();
+#endif
+    }
+
+    uintptr MuitlMemAlloctor::alloctor(
+        uint size
+#ifdef _check_memory_free
+        ,
+        cstring filepos, uint32 linepos
+#endif
+    )
+    {
+        Spinlocker lock(mLock);
+        return MemAlloctor::alloctor(size
+#ifdef _check_memory_free
+                                     ,
+                                     filepos, linepos
+#endif
+        );
+    }
+    void MuitlMemAlloctor::dealloctor(uintptr blk)
+    {
+        if (blk == nullptr)
+            return;
+        Spinlocker lock(mLock);
+        MemAlloctor::dealloctor(blk);
+    }
+
     // 初始化内存系统
     void initMemSys()
     {
         MemAlloctor::mCenter.init();
+        MuitlMemAlloctor::mInstance.init();
         MemAlloctorTLS::mTLS.init();
     }
     // 释放内存系统
     void terminalMemSys()
     {
+        // 多线程分配器内存释放情况
+        MuitlMemAlloctor::mInstance.checkFree();
+        MuitlMemAlloctor::mInstance.terminal();
         checkMemSys(); // 主线程内存释放情况
         MemAlloctorTLS::mTLS.terminal();
         MemAlloctor::mCenter.terminal();
@@ -479,6 +587,10 @@ namespace air
     IAlloctor &getThreadAlloctor()
     {
         return MemAlloctorTLS::mTLS.instance();
+    }
+    IAlloctor &getMainAlloctor()
+    {
+        return MuitlMemAlloctor::mInstance;
     }
     void checkMemSys()
     {

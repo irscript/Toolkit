@@ -9,7 +9,7 @@ namespace air
     class Spinlock
     {
     public:
-        Spinlock(Bool shared = Bool::False);
+        Spinlock(Bool shared = Bool::True);
         ~Spinlock();
 
         // 锁定
@@ -22,11 +22,11 @@ namespace air
     class Spinlocker
     {
     public:
-        inline Spinlocker() : mHandle() { mHandle.lock(); }
+        inline Spinlocker(Spinlock &handle) : mHandle(handle) { mHandle.lock(); }
         inline ~Spinlocker() { mHandle.unlock(); }
 
     protected:
-        Spinlock mHandle; // 互斥量句柄
+        Spinlock &mHandle; // 互斥量句柄
     };
 
     // 互斥量
@@ -92,7 +92,7 @@ namespace air
     {
     public:
         Thread();
-        virtual ~Thread();
+        ~Thread();
 
         // 需要运行的主函数
         virtual uint worker() = 0;
@@ -119,8 +119,8 @@ namespace air
         volatile Bool mShouldRun : 1; // 是否继续运行
         volatile Bool mDetached : 1;  // 线程是否分离
         volatile Bool mStoped : 1;    // 线程是否已经结束运行
-        ThreadID mHanlde;              // 线程句柄
-        static ThreadID mMainID;       // 主线程ID
+        ThreadID mHanlde;             // 线程句柄
+        static ThreadID mMainID;      // 主线程ID
     };
 
 }

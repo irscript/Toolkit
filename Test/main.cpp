@@ -6,10 +6,11 @@
 
 using namespace air;
 
-class TestApp : public Application
+class ThreadTask : public Thread
 {
 public:
-    virtual int32 run() override
+    ~ThreadTask() { stop(); }
+    uint worker() override
     {
         String str(0.3333f), str2(str), astr;
         astr = "Abc";
@@ -68,6 +69,21 @@ public:
 
         Recti ir(0, 0, 100, -100);
         print(ir.toString().cstr());
+
+        print("任务内容结束");
+        return 0;
+    }
+};
+
+class TestApp : public Application
+{
+public:
+    virtual int32 run() override
+    {
+        ThreadTask task1, task2, task3;
+        task1.start();
+        task2.start();
+        task3.start();
         return 0;
     }
 };

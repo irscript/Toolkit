@@ -6,7 +6,7 @@
 
 namespace air
 {
-    template <typename Key, typename Value>
+    template <typename Key, typename Value, const AlloctorType mem = AlloctorType::Thread>
     class Map
     {
     private:
@@ -25,7 +25,7 @@ namespace air
         };
         // 红黑树
         RBTree<Node> mTree;
-        Alloctor<Node> mAlloctor; // 内存分配器
+        Alloctor<Node,mem> mAlloctor; // 内存分配器
 
         // 获取内存
         template <typename... Args>

@@ -147,7 +147,7 @@ namespace air
             return Bool::False;
 
         mShouldRun = Bool::True;
-        mStoped = Bool::False;
+        mStoped = Bool::True;
         mDetached = detach;
 
         pthread_attr_t type;
@@ -163,12 +163,16 @@ namespace air
             mShouldRun = Bool::False;
             mDetached = Bool::False;
         }
+        else
+            mStoped = Bool::False;
         return ret;
     }
 
     void Thread::stop()
     {
-        if (mHanlde == 0)
+        if (mHanlde == 0 ||
+            mShouldRun == Bool::False ||
+            mStoped == Bool::True)
             return;
 
         mShouldRun = Bool::False;

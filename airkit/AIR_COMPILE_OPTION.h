@@ -11,7 +11,7 @@
 // 确保表达式成立
 #ifndef _air_no_debug
 #define make_ensure(exp)                                             \
-    if (!(exp))                                                        \
+    if (!(exp))                                                      \
     {                                                                \
         air::assertion(#exp, this_file(), this_func(), this_line()); \
     }

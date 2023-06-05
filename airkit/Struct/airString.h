@@ -32,7 +32,7 @@ namespace air
         inline constexpr bool isPrint(uint32 x) { return ::isprint(x); }
     }
 
-    template <typename Type>
+    template <typename Type, const AlloctorType mem = AlloctorType::Thread>
     class TString
     {
     public:
@@ -909,9 +909,9 @@ namespace air
             }
         }
 
-        sizetype mCapc;        // 缓存大小
-        sizetype mSize;        // 真实大小
-        Alloctor<Type> mAlloc; // 内存分配器
+        sizetype mCapc;             // 缓存大小
+        sizetype mSize;             // 真实大小
+        Alloctor<Type, mem> mAlloc; // 内存分配器
         Type *mData;
     };
 

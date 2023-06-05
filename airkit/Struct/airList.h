@@ -6,7 +6,7 @@
 namespace air
 {
     // 通用双向链表
-    template <typename Type>
+    template <typename Type, const AlloctorType mem = AlloctorType::Thread>
     class List
     {
     private:
@@ -17,8 +17,8 @@ namespace air
             inline Node() : IListNode<Node>() {}
             inline Node(const Type &ele) : IListNode<Node>() { constructor<Type>(&mData, ele); }
         };
-        IList<Node> mList;        // 链表管理
-        Alloctor<Node> mAlloctor; // 内存分配器
+        IList<Node> mList;             // 链表管理
+        Alloctor<Node, mem> mAlloctor; // 内存分配器
 
         // 获取内存
         template <typename... Args>

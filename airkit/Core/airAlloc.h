@@ -32,11 +32,26 @@ namespace air
     };
     // 获取当前线程的内存分配器
     IAlloctor &getThreadAlloctor();
+    // 获取多线程分配器
+    IAlloctor &getMainAlloctor();
+    // 线程局部分配器
+    enum class AlloctorType
+    {
+        Thread, // 线程局部分配器
+        Main,   // 主线程分配器
+    };
+
     // 内存分配器
-    template <typename Type>
+    template <typename Type, const AlloctorType mem = AlloctorType::Thread>
     struct Alloctor
     {
-        Alloctor() : mInstance(getThreadAlloctor()) {}
+        Alloctor() : mInstance(nullptr)
+        {
+            if (mem == AlloctorType::Thread)
+                mInstance = &getThreadAlloctor();
+            else if (mem == AlloctorType::Main)
+                mInstance = &getMainAlloctor();
+        }
         // 获取内存
         template <typename... Args>
         inline Type *alloc(
@@ -46,26 +61,27 @@ namespace air
             Args... args)
         {
             auto obj =
-                (Type *)mInstance.alloctor(sizeof(Type)
+                (Type *)mInstance->alloctor(sizeof(Type)
 #ifdef _check_memory_free
-                                               ,
-                                           filepos, linepos
+                                                ,
+                                            filepos, linepos
 #endif
                 );
             constructor<Type>(obj, args...);
             return obj;
         }
-        inline Type* allocArr(
+        inline Type *allocArr(
             uint count
 #ifdef _check_memory_free
-            ,cstring filepos, uint32 linepos
+            ,
+            cstring filepos, uint32 linepos
 #endif
-)
+        )
         {
-            return (Type *)mInstance.alloctor(sizeof(Type) * count
+            return (Type *)mInstance->alloctor(sizeof(Type) * count
 #ifdef _check_memory_free
-                                              ,
-                                              filepos, linepos
+                                               ,
+                                               filepos, linepos
 #endif
             );
         }
@@ -74,11 +90,11 @@ namespace air
         inline void dealloc(Type *block)
         {
             destructor<Type>(block);
-            mInstance.dealloctor(block);
+            mInstance->dealloctor(block);
         }
 
     protected:
-        IAlloctor &mInstance; // 分配器实例
+        IAlloctor *mInstance; // 分配器实例
     };
 
     //====================线程局部的内存分配管理器===========================
