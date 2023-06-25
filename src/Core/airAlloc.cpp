@@ -534,7 +534,7 @@ namespace air
 #ifdef _check_memory_free
         uint dbgcnt = 0;
         memlog.start();
-        memlog.append("\n\n------------------checking-free-start[ main ]---------------------\n");
+        memlog.append("\n\n------------------checking-free-start[ shared ]---------------------\n");
 
         // 通用内存块
         for (uint i = 0; i < _pool_count; ++i)
@@ -562,7 +562,7 @@ namespace air
             ++dbgcnt;
         }
         memlog.append("\nchecking-free-count: %ld\n\n", dbgcnt);
-        memlog.append("------------------checking-free-end[ main ]----------------------\n\n\n");
+        memlog.append("------------------checking-free-end[ shared ]----------------------\n\n\n");
         memlog.end();
 #endif
     }
@@ -612,7 +612,7 @@ namespace air
     {
         return MemAlloctorTLS::mTLS.instance();
     }
-    IAlloctor &getMainAlloctor()
+    IAlloctor &getSharedAlloctor()
     {
         return MuitlMemAlloctor::mInstance;
     }

@@ -21,6 +21,7 @@
         "scoped_allocator": "cpp",
         "tuple": "cpp",
         "utility": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "coroutine": "cpp"
     }
 }

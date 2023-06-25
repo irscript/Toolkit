@@ -14,11 +14,16 @@ add_includedirs("./")
 --动态库
 target("airkit-dll")
     set_kind("shared")
+    add_includedirs("./","./airkit/3Part/","D:/VulkanSDK/Include/")
     add_files("src/**.cpp")
     if(is_os("windows"))then 
         add_files("PlatWin/**.cpp")
     end
     add_links("pthread")
+    add_linkdirs("./airkit/3Part/lib",
+    "D:/VulkanSDK/Lib"                          --vulkan
+    )
+    add_links("glfw3","opengl32","gdi32","vulkan-1")
 --静态库
 --target("airkit-lib")
  --   set_kind("static")
@@ -29,9 +34,14 @@ target("airkit-dll")
  --   add_links("ptheard")
 --测试
 target("test")
+    add_includedirs("./","./airkit/3Part/","D:/VulkanSDK/Include/")
     set_kind("binary")
     add_deps("airkit-dll")
     add_files("Test/main.cpp")
+    add_linkdirs("./airkit/3Part/lib",
+    "D:/VulkanSDK/Lib"                          --vulkan
+    )
+    add_links("glfw3","opengl32","gdi32","vulkan-1")
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --

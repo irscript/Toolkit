@@ -1,36 +1,41 @@
 [
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\main.cpp.obj", "Test\\main.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\main.cpp.obj", "Test\\main.cpp"],
   "file": "Test\\main.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airAlloc.cpp.obj", "src\\Core\\airAlloc.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airAlloc.cpp.obj", "src\\Core\\airAlloc.cpp"],
   "file": "src\\Core\\airAlloc.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airApp.cpp.obj", "src\\Core\\airApp.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airApp.cpp.obj", "src\\Core\\airApp.cpp"],
   "file": "src\\Core\\airApp.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airThread.cpp.obj", "src\\Core\\airThread.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Core\\airThread.cpp.obj", "src\\Core\\airThread.cpp"],
   "file": "src\\Core\\airThread.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Hash\\airHash.cpp.obj", "src\\Hash\\airHash.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Hash\\airHash.cpp.obj", "src\\Hash\\airHash.cpp"],
   "file": "src\\Hash\\airHash.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Struct\\airAString.cpp.obj", "src\\Struct\\airAString.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Render\\UI\\airGUIElement.cpp.obj", "src\\Render\\UI\\airGUIElement.cpp"],
+  "file": "src\\Render\\UI\\airGUIElement.cpp"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Struct\\airAString.cpp.obj", "src\\Struct\\airAString.cpp"],
   "file": "src\\Struct\\airAString.cpp"
 },
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\PlatWin\\airLoger.cpp.obj", "PlatWin\\airLoger.cpp"],
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\PlatWin\\airLoger.cpp.obj", "PlatWin\\airLoger.cpp"],
   "file": "PlatWin\\airLoger.cpp"
 }]

@@ -33,7 +33,7 @@ namespace air
     // 获取当前线程的内存分配器
     IAlloctor &getThreadAlloctor();
     // 获取多线程分配器
-    IAlloctor &getMainAlloctor();
+    IAlloctor &getSharedAlloctor();
     // 获取标准库内存分配器
     IAlloctor &getOSAlloctor();
     // 线程局部分配器
@@ -53,7 +53,7 @@ namespace air
             if (mem == AlloctorType::Thread)
                 mInstance = &getThreadAlloctor();
             else if (mem == AlloctorType::Main)
-                mInstance = &getMainAlloctor();
+                mInstance = &getSharedAlloctor();
             else if (mem == AlloctorType::OS)
                 mInstance = &getOSAlloctor();
         }
@@ -97,7 +97,11 @@ namespace air
             destructor<Type>(block);
             mInstance->dealloctor(block);
         }
-
+        Alloctor &operator=(const Alloctor &rhs)
+        {
+            mInstance = rhs.mInstance;
+            return *this;
+        }
     protected:
         IAlloctor *mInstance; // 分配器实例
     };

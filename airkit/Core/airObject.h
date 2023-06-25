@@ -13,7 +13,7 @@ namespace air
         volatile int32 mRefCnt; // 引用计数
     public:
         IRefObject() : mRefCnt(1) {}
-        virtual ~IRefObject() = 0;
+        virtual ~IRefObject() {}
         // 引用一次
         inline void grab() { Atomic<int32>::addFetch(mRefCnt, 1); }
         // 释放一次

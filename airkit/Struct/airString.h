@@ -163,6 +163,7 @@ namespace air
             ++size;
             if (size > mCapc)
                 realloc(size);
+            mData[mSize] = 0;
         }
 
         // 查找匹配函数

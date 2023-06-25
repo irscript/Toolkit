@@ -4,8 +4,13 @@
 // 编译选项在此定义
 
 // 内存泄露检查宏
-#ifndef _check_memory_free
+#ifndef _disable_check_memory_free
 #define _check_memory_free
+#endif
+
+// vulkan debug层
+#ifndef _disable_air_vulkan_debug_report
+#define _air_vulkan_debug_report
 #endif
 
 // 确保表达式成立
