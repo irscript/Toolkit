@@ -13,46 +13,50 @@ namespace air
     // 渲染器设备驱动
     struct VkRenderDriver
     {
-        Vector<VkPhysicalDevice> mPhysicalset; // 物理设备集合
+        VkRenderDriver();
 
-        // VkAllocationCallbacks mAllocCallback; // 内存分配
-        VkAllocationCallbacks *mACallback; // 内存分配
-        VkInstance mInstance;              // 实例句柄
-        VkPhysicalDevice mPhysical;        // 选择的物理设备
-        VkDevice mDevice;                  // 逻辑设备句柄
-        VkDescriptorPool mDescPool;        // 描述池
+    public:
+        // 成员变量
+        VkAllocationCallbacks *mAllocCall; // 内存分配器回调
 
-        Vector<cstring> mPhysExt;                        // 开启的扩展信息
-        Vector<VkQueueFamilyProperties> mQueueFamilyPro; // 队列簇属性
-        Vector<cstring> mDeviceExt;                      // 开启的逻辑设备扩展
+        VkInstance mInstance;                  // 应用实例
+        Vector<cstring> mInsExt;               // 实例扩展信息
+        Vector<cstring> mLayers;               // 验证层扩展
+        VkDebugReportCallbackEXT mDebugReport; // debug回调
 
-        // 显示表面相关信息
+        Vector<VkPhysicalDevice> mPhysicalSet;           // 物理设备集合
+        VkPhysicalDevice mPhysical;                      // 选择的物理设备
+        Vector<VkQueueFamilyProperties> mQueueFamilyPro; // 物理设备的队列属性集合
 
-        // 队列索引
-        int32 mGraphicsIndex; // 图像队列索引
-        int32 mPresentIndex;  // 呈现队列索引
-        int32 mComputeIndex;  // 计算队列索引
-        int32 mTransferIndex; // 传输队列索引
+        // 需要的一些队列
+        uint32 mGraphicsIndex; // 图形队列索引
+        uint32 mComputeIndex;  // 计算队列索引
+        uint32 mTransferIndex; // 传输队列索引
 
-        // 队列句柄
-        VkQueue mGraphicsQueue; // 图像队列句柄
-        VkQueue mPresentQueue;  // 呈现队列句柄
+        VkQueue mGraphicsQueue; // 图形队列句柄
         VkQueue mComputeQueue;  // 计算队列句柄
         VkQueue mTransferQueue; // 传输队列句柄
 
-#ifdef _air_vulkan_debug_report
-        VkDebugReportCallbackEXT mReportCallback; // 错误回调
-        Vector<cstring> mLayers;                  // 验证层
-#endif
+        VkDevice mDevice;           // 逻辑设备
+        Vector<cstring> mDeviceExt; // 逻辑设备扩展信息
+        VkDescriptorPool mDescPool; // 描述池句柄
 
-        // 通过扩展启动渲染器设备驱动
+        
+    public:
         void setup();
         // 释放
         void destory();
 
-        static void check_vk_result(VkResult err);
+        static void checkVKResult(VkResult err);
+        static VKAPI_ATTR VkBool32 VKAPI_CALL debugReport(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
+                                                          uint64_t object, size_t location, int32_t messageCode,
+                                                          const char *pLayerPrefix, const char *pMessage, void *pUserData);
+        // 通过呈现模式获取最小显示缓存图像数目
+        void getMinImgCount();
 
     protected:
+        // 检查验证层是否可用
+        void checkLayerSupport();
         // 创建实例
         void createInstance();
         // 选择gpu

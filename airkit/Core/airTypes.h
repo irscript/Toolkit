@@ -76,7 +76,7 @@ namespace air
 
 // 求数组维度
 #define array_size(obj, type) (sizeof(obj) / sizeof(type))
-
+#define array_size_ext(obj) (sizeof(obj) / sizeof(*obj))
 }
 
 #endif //!__AIRTYPES__H__

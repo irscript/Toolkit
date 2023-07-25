@@ -4,6 +4,7 @@
 
 namespace air
 {
+    /*
     void VkUIPipeline::onRenderWindow(IWindow *window)
     {
         auto &win = *(VkWindow *)window;
@@ -27,7 +28,7 @@ namespace air
         info.maxLod = 1000;
         info.maxAnisotropy = 1.0f;
         VkResult err = vkCreateSampler(driver.mDevice, &info, driver.mACallback, &mUISamper);
-        VkRenderDriver::check_vk_result(err);
+        VkRenderDriver::checkVKResult(err);
     }
     // 创建描述集布局
     void VkUIPipeline::creatDescLayout(VkRenderDriver &driver)
@@ -43,7 +44,7 @@ namespace air
         info.bindingCount = 1;
         info.pBindings = binding;
         VkResult err = vkCreateDescriptorSetLayout(driver.mDevice, &info, driver.mACallback, &mDescLayout);
-        VkRenderDriver::check_vk_result(err);
+        VkRenderDriver::checkVKResult(err);
     }
     // 创建管线布局
     void VkUIPipeline::createPipelineLayout(VkRenderDriver &driver)
@@ -60,7 +61,7 @@ namespace air
         layout_info.pushConstantRangeCount = 1;
         layout_info.pPushConstantRanges = push_constants;
         VkResult err = vkCreatePipelineLayout(driver.mDevice, &layout_info, driver.mACallback, &mPipelineLayout);
-        VkRenderDriver::check_vk_result(err);
+        VkRenderDriver::checkVKResult(err);
     }
 
     // UI着色器
@@ -144,7 +145,7 @@ namespace air
         vert_info.pCode = (uint32_t *)__glsl_shader_vert_spv;
         VkResult err = vkCreateShaderModule(driver.mDevice, &vert_info,
                                             driver.mACallback, &mVertShader);
-        VkRenderDriver::check_vk_result(err);
+        VkRenderDriver::checkVKResult(err);
 
         VkShaderModuleCreateInfo frag_info = {};
         frag_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -152,7 +153,7 @@ namespace air
         frag_info.pCode = (uint32_t *)__glsl_shader_frag_spv;
         err = vkCreateShaderModule(driver.mDevice, &frag_info,
                                    driver.mACallback, &mFragShader);
-        VkRenderDriver::check_vk_result(err);
+        VkRenderDriver::checkVKResult(err);
     }
 
     void VkUIPipeline::createPipeline(VkRenderDriver &driver)
@@ -260,11 +261,12 @@ namespace air
         info.subpass = 0;
         VkResult err = vkCreateGraphicsPipelines(driver.mDevice, mPipelineCache,
                                                  1, &info, driver.mACallback, &mPipeline);
-        VkRenderDriver::check_vk_result(err);
+        VkRenderDriver::checkVKResult(err);
     }
 
     // 释放管线
     void VkUIPipeline::destoryPipeline(VkRenderDriver &driver)
     {
     }
+    */
 }

@@ -17,10 +17,7 @@ namespace air
         virtual IWindow *createWindow(const String &title, flt32 withd, flt32 height) = 0;
         // 释放窗口
         virtual void destroyWindow(IWindow *window) = 0;
-        // 创建UI渲染管线
-        virtual IUIRenderPipeline *createUIPipeline() = 0;
-        // 释放UI渲染管线
-        virtual void destroyUIPipeline(IUIRenderPipeline *pipeline) = 0;
+        
     };
 }
 #endif //!__AIRIRENDER__H__

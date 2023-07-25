@@ -20,11 +20,10 @@ public:
             return 1;
 
         auto window = render.createWindow("air-app", 800, 600);
-        auto pipe = render.createUIPipeline();
 
-        pipe->onRenderWindow(window);
 
-        render.destroyUIPipeline(pipe);
+        // pipe->onRenderWindow(window);
+
         render.destroyWindow(window);
 
         render.terminal();

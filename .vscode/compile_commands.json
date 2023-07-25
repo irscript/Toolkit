@@ -1,8 +1,13 @@
 [
 {
   "directory": "e:\\Project\\Toolkit",
-  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\main.cpp.obj", "Test\\main.cpp"],
-  "file": "Test\\main.cpp"
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe", "-c", "-m64", "-g", "-O0", "-std=c17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Glad2\\gl.c.obj", "src\\Glad2\\gl.c"],
+  "file": "src\\Glad2\\gl.c"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe", "-c", "-m64", "-g", "-O0", "-std=c17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\Glad2\\vulkan.c.obj", "src\\Glad2\\vulkan.c"],
+  "file": "src\\Glad2\\vulkan.c"
 },
 {
   "directory": "e:\\Project\\Toolkit",
@@ -36,6 +41,26 @@
 },
 {
   "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\VKRender\\airVkRender.cpp.obj", "src\\VKRender\\airVkRender.cpp"],
+  "file": "src\\VKRender\\airVkRender.cpp"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\VKRender\\airVkRenderDriver.cpp.obj", "src\\VKRender\\airVkRenderDriver.cpp"],
+  "file": "src\\VKRender\\airVkRenderDriver.cpp"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\src\\VKRender\\airVkUIRenderPipeline.cpp.obj", "src\\VKRender\\airVkUIRenderPipeline.cpp"],
+  "file": "src\\VKRender\\airVkUIRenderPipeline.cpp"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
   "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\airkit-dll\\mingw\\x86_64\\debug\\PlatWin\\airLoger.cpp.obj", "PlatWin\\airLoger.cpp"],
   "file": "PlatWin\\airLoger.cpp"
+},
+{
+  "directory": "e:\\Project\\Toolkit",
+  "arguments": ["E:\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-g", "-O0", "-std=c++17", "-I.", "-Iairkit\\3Part", "-ID:\\VulkanSDK\\Include", "-D_check_memory_free", "-o", "build\\.objs\\test\\mingw\\x86_64\\debug\\Test\\main.cpp.obj", "Test\\main.cpp"],
+  "file": "Test\\main.cpp"
 }]

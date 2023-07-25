@@ -15,7 +15,7 @@ add_includedirs("./")
 target("airkit-dll")
     set_kind("shared")
     add_includedirs("./","./airkit/3Part/","D:/VulkanSDK/Include/")
-    add_files("src/**.cpp")
+    add_files("src/**.cpp","src/Glad2/*.c")
     if(is_os("windows"))then 
         add_files("PlatWin/**.cpp")
     end

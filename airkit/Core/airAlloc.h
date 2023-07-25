@@ -102,6 +102,7 @@ namespace air
             mInstance = rhs.mInstance;
             return *this;
         }
+
     protected:
         IAlloctor *mInstance; // 分配器实例
     };
@@ -110,6 +111,9 @@ namespace air
 
     // 线程内存分配
 #ifdef _check_memory_free
+// 共享内存分配器
+#define salloc(size) getSharedAlloctor().alloctor(size, this_file(), this_line())
+// 线程局部分配器
 #define talloc(size) alloc_(size, this_file(), this_line())
     inline uintptr alloc_(uint size, cstring filepos, uint32 linepos)
     {
@@ -117,19 +121,26 @@ namespace air
         return getThreadAlloctor().alloctor(size, filepos, linepos);
     }
 #else
+#define salloc(size) getSharedAlloctor().alloctor(size)
     inline uintptr alloc(uint size)
     {
         make_ensure(size != 0);
         return getThreadAlloctor().alloctor(size);
     }
 #endif
+
     // 线程内存释放
     inline void tdealloc(uintptr block)
     {
         if (block != nullptr)
             getThreadAlloctor().dealloctor(block);
     }
-
+    // 共享内存释放
+    inline void sdealloc(uintptr block)
+    {
+        if (block != nullptr)
+            getSharedAlloctor().dealloctor(block);
+    }
 }
 
 #endif //!__AIRALLOC__H__

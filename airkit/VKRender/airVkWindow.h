@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 #include <airkit/Render/airRender.h>
-
+#include <airkit/VKRender/airVkRenderDriver.h>
 namespace air
 {
     // 帧缓存信息描述
@@ -27,30 +27,35 @@ namespace air
         VkSemaphore RenderCompleteSemaphore;
         VKFrameSemaphores() { memset(this, 0, sizeof(VKFrameSemaphores)); }
     };
-    struct VkWindow : public IWindow
+    struct VkWindow : public GlfwWindow
     {
-        VkWindow() : IWindow() {}
+        VkWindow();
+        ~VkWindow();
 
     protected:
-        inline GLFWwindow *glfwWindow() { return (GLFWwindow *)mNative; }
+        // 初始化窗口
+        bool setupWindow(VkRenderDriver &driver, const String &title, flt32 width, flt32 height);
+        // 选择表面格式
+        void selectSurfaceFormat(VkRenderDriver &driver);
+        // 选择呈现模式
+        void selectPresentMode(VkRenderDriver &driver);
+        // 创建窗口交换链
+        void createSwapchain(VkRenderDriver &driver);
+        // 创建窗口命令池
 
     protected:
         friend struct VkRender;
         friend struct VkUIPipeline;
-
-        uint32 mWidth;             // 窗口宽度
-        uint32 mHeight;            // 窗口高度
-        String mTitle;             // 窗口标题
         
+
         VkSwapchainKHR mSwapchain; // 交换链
         VkSurfaceKHR mSurface;     // 窗口表面
 
-        VkSurfaceFormatKHR mSurfaceFormat; // 表面格式
+        VkSurfaceFormatKHR mSurfaceFmt; // 表面格式
         VkPresentModeKHR mPresentMode;     // 呈现模式
         VkRenderPass mRenderPass;          // 渲染通道
 
-        Vector<VKFrameInfo> mFrame;           // 帧缓存
-        Vector<VKFrameSemaphores> mSemaphore; // 帧同步信号
+
     };
 }
 #endif //!__AIRVKWINDOW__H__

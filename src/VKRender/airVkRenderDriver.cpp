@@ -3,101 +3,46 @@
 
 namespace air
 {
-
-    void VkRenderDriver::check_vk_result(VkResult err)
+    void VkRenderDriver::checkVKResult(VkResult err)
     {
-        if (err == 0)
-            return;
-        errlog("[vulkan] Error: VkResult = %d\n", err);
+        if (err != 0)
+            errlog("[vulkan] Error: VkResult = %d\n", err);
         if (err < 0)
             abort();
     }
 
-#ifdef _air_vulkan_debug_report
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char *pLayerPrefix, const char *pMessage, void *pUserData)
+    VKAPI_ATTR VkBool32 VKAPI_CALL VkRenderDriver::debugReport(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType,
+                                                               uint64_t object, size_t location, int32_t messageCode,
+                                                               const char *pLayerPrefix, const char *pMessage, void *pUserData)
     {
-        (void)flags;
-        (void)object;
-        (void)location;
-        (void)messageCode;
-        (void)pUserData;
-        (void)pLayerPrefix; // Unused arguments
-        errlog("[vulkan] Debug report from ObjectType: %i\nMessage: %s\n\n", objectType, pMessage);
+        errlog("[vulkan] Debug report from ObjectType: %i\n\tMessage: %s\n\n", objectType, pMessage);
         return VK_FALSE;
     }
-#endif
 
-    void *vulkan_alloc_allocation(void *user_data, size_t size, size_t alignment, VkSystemAllocationScope allocation_scope)
+    VkRenderDriver::VkRenderDriver()
     {
-        // Null MUST be returned if this fails.
-        if (size == 0)
-        {
-            return 0;
-        }
-
-        void *result = getSharedAlloctor().alloctor(size,
-#ifdef _check_memory_free
-                                                    this_file(), this_line()
-#endif
-        );
-
-        return result;
-    }
-
-    void vulkan_alloc_free(void *user_data, void *memory)
-    {
-        getSharedAlloctor().dealloctor(memory);
-    }
-
-    void *vulkan_alloc_reallocation(void *user_data, void *original, size_t size, size_t alignment, VkSystemAllocationScope allocation_scope)
-    {
-        if (!original)
-        {
-            return vulkan_alloc_allocation(user_data, size, alignment, allocation_scope);
-        }
-
-        if (size == 0)
-        {
-            return 0;
-        }
-        return nullptr;
-    }
-
-    void vulkan_alloc_internal_alloc(void *pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope)
-    {
-    }
-
-    void vulkan_alloc_internal_free(void *pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope)
-    {
-    }
-
-    void VkRenderDriver::setup()
-    {
-        mACallback = nullptr;
-        /*
-        mAllocCallback.pfnAllocation = vulkan_alloc_allocation;
-        mAllocCallback.pfnFree = vulkan_alloc_free;
-        mAllocCallback.pfnReallocation = vulkan_alloc_reallocation;
-        mAllocCallback.pfnInternalAllocation = vulkan_alloc_internal_alloc;
-        mAllocCallback.pfnInternalFree = vulkan_alloc_internal_free;
-        mAllocCallback.pUserData = nullptr;
-*/
-
+        mAllocCall = nullptr;
         mInstance = nullptr;
+        mDebugReport = nullptr;
+
         mPhysical = nullptr;
-        mDevice = nullptr;
-        mDescPool = nullptr;
 
         mGraphicsIndex = -1;
-        mPresentIndex = -1;
         mComputeIndex = -1;
         mTransferIndex = -1;
 
         mGraphicsQueue = nullptr;
-        mPresentQueue = nullptr;
         mComputeQueue = nullptr;
         mTransferQueue = nullptr;
 
+        mDevice = nullptr;
+        mDescPool = nullptr;
+
+        
+    }
+
+    void VkRenderDriver::setup()
+    {
         createInstance();
         selectGPU();
         selectQueueFamily();
@@ -107,18 +52,27 @@ namespace air
 
     void VkRenderDriver::destory()
     {
-        vkDestroyDescriptorPool(mDevice, mDescPool, mACallback);
+        vkDestroyDescriptorPool(mDevice, mDescPool, mAllocCall);
 
 #ifdef _air_vulkan_debug_report
         // Remove the debug report callback
         auto vkDestroyDebugReportCallbackEXT = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(mInstance, "vkDestroyDebugReportCallbackEXT");
-        vkDestroyDebugReportCallbackEXT(mInstance, mReportCallback, mACallback);
+        vkDestroyDebugReportCallbackEXT(mInstance, mDebugReport, mAllocCall);
 #endif
 
-        vkDestroyDevice(mDevice, mACallback);
-        vkDestroyInstance(mInstance, mACallback);
+        vkDestroyDevice(mDevice, mAllocCall);
+        vkDestroyInstance(mInstance, mAllocCall);
     }
 
+    void VkRenderDriver::checkLayerSupport()
+    {
+        uint32 layerCount;
+        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+        Vector<VkLayerProperties> availableLayers;
+        availableLayers.resize(layerCount);
+        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+    }
     void VkRenderDriver::createInstance()
     {
         VkResult err;
@@ -130,43 +84,47 @@ namespace air
         app_info.pEngineName = "airkit-engine-vk";
         app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 
+        // 获取实例扩展信息
         uint32 extensions_count = 0;
         const char **extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
-        mPhysExt.resize(extensions_count);
-        memcpy(mPhysExt.data(), extensions, sizeof(cstring) * extensions_count);
+        mInsExt.resize(extensions_count);
+        memcpy(mInsExt.data(), extensions, sizeof(cstring) * extensions_count);
 
 #ifdef _air_vulkan_debug_report
-        mPhysExt.pushBack("VK_EXT_debug_report");
+        mInsExt.pushBack(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+        checkLayerSupport();
 #endif
         // 创建vulkan实例
 
         VkInstanceCreateInfo crtinfo = {};
         crtinfo.pApplicationInfo = &app_info;
         crtinfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        crtinfo.enabledExtensionCount = mPhysExt.size();
-        crtinfo.ppEnabledExtensionNames = mPhysExt.data();
+        crtinfo.enabledExtensionCount = mInsExt.size();
+        crtinfo.ppEnabledExtensionNames = mInsExt.data();
+
+        // 设置开启的验证层扩展
 #ifdef _air_vulkan_debug_report
         mLayers.pushBack("VK_LAYER_KHRONOS_validation");
         crtinfo.enabledLayerCount = mLayers.size();
         crtinfo.ppEnabledLayerNames = mLayers.data();
-        err = vkCreateInstance(&crtinfo, mACallback, &mInstance);
-        check_vk_result(err);
+        err = vkCreateInstance(&crtinfo, mAllocCall, &mInstance);
+        checkVKResult(err);
 
-        // Get the function pointer (required for any extensions)
+        // 获取函数地址
         auto vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT");
         make_ensure(vkCreateDebugReportCallbackEXT != NULL);
 
-        // Setup the debug report callback
+        // 创建调试信息回调
         VkDebugReportCallbackCreateInfoEXT debug_report_ci = {};
         debug_report_ci.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
         debug_report_ci.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-        debug_report_ci.pfnCallback = debug_report;
+        debug_report_ci.pfnCallback = debugReport;
         debug_report_ci.pUserData = NULL;
-        err = vkCreateDebugReportCallbackEXT(mInstance, &debug_report_ci, mACallback, &mReportCallback);
-        check_vk_result(err);
+        err = vkCreateDebugReportCallbackEXT(mInstance, &debug_report_ci, mAllocCall, &mDebugReport);
+        checkVKResult(err);
 #else
-        err = vkCreateInstance(&crtinfo, mACallback, &mInstance);
-        check_vk_result(err);
+        err = vkCreateInstance(&crtinfo, mAllocCall, &mInstance);
+        checkVKResult(err);
 
 #endif
     }
@@ -176,16 +134,16 @@ namespace air
         VkResult err;
         uint32 gpucnt = 0;
         err = vkEnumeratePhysicalDevices(mInstance, &gpucnt, NULL);
-        check_vk_result(err);
-        mPhysicalset.resize(gpucnt);
-        err = vkEnumeratePhysicalDevices(mInstance, &gpucnt, mPhysicalset.data());
-        check_vk_result(err);
+        checkVKResult(err);
+        mPhysicalSet.resize(gpucnt);
+        err = vkEnumeratePhysicalDevices(mInstance, &gpucnt, mPhysicalSet.data());
+        checkVKResult(err);
 
         uint32 gpu = 0; // 选择的GPU
         for (uint32 i = 0; i < gpucnt; i++)
         {
             VkPhysicalDeviceProperties properties;
-            vkGetPhysicalDeviceProperties(mPhysicalset[i], &properties);
+            vkGetPhysicalDeviceProperties(mPhysicalSet[i], &properties);
             // 最好是独立GPU而非集成GPU
             if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
             {
@@ -194,7 +152,7 @@ namespace air
             }
         }
         // 记录使用的物理设备
-        mPhysical = mPhysicalset[gpu];
+        mPhysical = mPhysicalSet[gpu];
     }
 
     void VkRenderDriver::selectQueueFamily()
@@ -247,8 +205,8 @@ namespace air
         create_info.pQueueCreateInfos = queue_info;
         create_info.enabledExtensionCount = mDeviceExt.size();
         create_info.ppEnabledExtensionNames = mDeviceExt.data();
-        err = vkCreateDevice(mPhysical, &create_info, mACallback, &mDevice);
-        check_vk_result(err);
+        err = vkCreateDevice(mPhysical, &create_info, mAllocCall, &mDevice);
+        checkVKResult(err);
         // 获取队列
         vkGetDeviceQueue(mDevice, mGraphicsIndex, 0, &mGraphicsQueue);
         vkGetDeviceQueue(mDevice, mComputeIndex, 0, &mComputeQueue);
@@ -276,7 +234,9 @@ namespace air
         pool_info.maxSets = 1000 * array_size(pool_sizes, VkDescriptorPoolSize);
         pool_info.poolSizeCount = (uint32_t)array_size(pool_sizes, VkDescriptorPoolSize);
         pool_info.pPoolSizes = pool_sizes;
-        err = vkCreateDescriptorPool(mDevice, &pool_info, mACallback, &mDescPool);
-        check_vk_result(err);
+        err = vkCreateDescriptorPool(mDevice, &pool_info, mAllocCall, &mDescPool);
+        checkVKResult(err);
     }
+
+  
 }
